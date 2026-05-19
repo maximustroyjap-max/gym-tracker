@@ -1,0 +1,242 @@
+/**
+ * EXERCISE DATABASE
+ * A comprehensive list of gym exercises organized by body part and equipment category.
+ * All exercises are sorted alphabetically by name for display.
+ */
+
+export type BodyPart =
+  | 'Core'
+  | 'Arms'
+  | 'Back'
+  | 'Chest'
+  | 'Legs'
+  | 'Shoulders'
+  | 'Other'
+  | 'Olympic'
+  | 'Full Body'
+  | 'Cardio';
+
+export type Category =
+  | 'Barbell'
+  | 'Dumbbell'
+  | 'Machine/Other'
+  | 'Weighted Bodyweight'
+  | 'Assisted Bodyweight'
+  | 'Reps Only'
+  | 'Cardio'
+  | 'Duration';
+
+export interface Exercise {
+  id: string;
+  name: string;
+  bodyPart: BodyPart;
+  category: Category;
+}
+
+export const BODY_PARTS: BodyPart[] = [
+  'Core',
+  'Arms',
+  'Back',
+  'Chest',
+  'Legs',
+  'Shoulders',
+  'Other',
+  'Olympic',
+  'Full Body',
+  'Cardio',
+];
+
+export const CATEGORIES: Category[] = [
+  'Barbell',
+  'Dumbbell',
+  'Machine/Other',
+  'Weighted Bodyweight',
+  'Assisted Bodyweight',
+  'Reps Only',
+  'Cardio',
+  'Duration',
+];
+
+const _EXERCISES: Exercise[] = [
+  { id: 'ab-wheel-kneeling', name: 'Ab Wheel Rollout (Kneeling)', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'ab-wheel-standing', name: 'Ab Wheel Rollout (Standing)', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'arnold-press-dumbbell', name: 'Arnold Press', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'back-extension', name: 'Back Extension', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'band-pull-apart', name: 'Band Pull-Apart', bodyPart: 'Shoulders', category: 'Machine/Other' },
+  { id: 'banded-face-pull', name: 'Banded Face Pull', bodyPart: 'Shoulders', category: 'Machine/Other' },
+  { id: 'banded-good-morning', name: 'Banded Good Morning', bodyPart: 'Other', category: 'Machine/Other' },
+  { id: 'banded-hip-thrust', name: 'Banded Hip Thrust', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'banded-leg-curl', name: 'Banded Leg Curl', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'banded-pull-through', name: 'Banded Pull-Through', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'battle-ropes', name: 'Battle Ropes', bodyPart: 'Cardio', category: 'Duration' },
+  { id: 'belt-squat', name: 'Belt Squat', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'bench-press-barbell', name: 'Bench Press (Barbell)', bodyPart: 'Chest', category: 'Barbell' },
+  { id: 'bench-press-close-grip', name: 'Bench Press - Close Grip', bodyPart: 'Arms', category: 'Barbell' },
+  { id: 'bench-press-dumbbell', name: 'Bench Press (Dumbbell)', bodyPart: 'Chest', category: 'Dumbbell' },
+  { id: 'bicep-curl-barbell', name: 'Bicep Curl (Barbell)', bodyPart: 'Arms', category: 'Barbell' },
+  { id: 'bicep-curl-dumbbell', name: 'Bicep Curl (Dumbbell)', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'bicep-curl-hammer', name: 'Bicep Curl - Hammer', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'bicep-curl-machine', name: 'Bicep Curl (Machine)', bodyPart: 'Arms', category: 'Machine/Other' },
+  { id: 'bicep-curl-preacher', name: 'Preacher Curl', bodyPart: 'Arms', category: 'Barbell' },
+  { id: 'bird-dog', name: 'Bird Dog', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'bicycle-crunch', name: 'Bicycle Crunch', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'bulgarian-split-squat', name: 'Bulgarian Split Squat', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'cable-crossover', name: 'Cable Crossover', bodyPart: 'Chest', category: 'Machine/Other' },
+  { id: 'cable-curl', name: 'Cable Curl', bodyPart: 'Arms', category: 'Machine/Other' },
+  { id: 'calf-raise-dumbbell', name: 'Calf Raise (Dumbbell)', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'calf-raise-seated', name: 'Calf Raise - Seated', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'calf-raise-standing', name: 'Calf Raise - Standing', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'chest-fly-cable', name: 'Chest Fly (Cable)', bodyPart: 'Chest', category: 'Machine/Other' },
+  { id: 'chest-fly-dumbbell', name: 'Chest Fly (Dumbbell)', bodyPart: 'Chest', category: 'Dumbbell' },
+  { id: 'chest-fly-machine', name: 'Chest Fly (Machine)', bodyPart: 'Chest', category: 'Machine/Other' },
+  { id: 'chin-up', name: 'Chin-Up', bodyPart: 'Back', category: 'Weighted Bodyweight' },
+  { id: 'clean-and-jerk', name: 'Clean and Jerk', bodyPart: 'Olympic', category: 'Barbell' },
+  { id: 'clean-pull', name: 'Clean Pull', bodyPart: 'Olympic', category: 'Barbell' },
+  { id: 'close-grip-dumbbell-press', name: 'Close Grip Dumbbell Press', bodyPart: 'Chest', category: 'Dumbbell' },
+  { id: 'concentration-curl', name: 'Concentration Curl', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'copenhagen-plank', name: 'Copenhagen Plank', bodyPart: 'Core', category: 'Duration' },
+  { id: 'crunch', name: 'Crunch', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'crunch-cable', name: 'Cable Crunch', bodyPart: 'Core', category: 'Machine/Other' },
+  { id: 'cross-body-curl', name: 'Cross-Body Curl', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'cycling-stationary', name: 'Cycling (Stationary)', bodyPart: 'Cardio', category: 'Cardio' },
+  { id: 'dead-bug', name: 'Dead Bug', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'deadlift-conventional', name: 'Deadlift (Conventional)', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'deadlift-deficit', name: 'Deficit Deadlift', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'deadlift-dumbbell', name: 'Deadlift (Dumbbell)', bodyPart: 'Back', category: 'Dumbbell' },
+  { id: 'deadlift-romanian', name: 'Romanian Deadlift', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'deadlift-sumo', name: 'Deadlift (Sumo)', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'decline-press-barbell', name: 'Decline Press (Barbell)', bodyPart: 'Chest', category: 'Barbell' },
+  { id: 'decline-press-dumbbell', name: 'Decline Press (Dumbbell)', bodyPart: 'Chest', category: 'Dumbbell' },
+  { id: 'deficit-push-up', name: 'Deficit Push-Up', bodyPart: 'Other', category: 'Reps Only' },
+  { id: 'dip-assisted', name: 'Dip (Assisted)', bodyPart: 'Chest', category: 'Assisted Bodyweight' },
+  { id: 'dip-chest', name: 'Dip (Chest)', bodyPart: 'Chest', category: 'Weighted Bodyweight' },
+  { id: 'dip-tricep', name: 'Dip (Tricep)', bodyPart: 'Arms', category: 'Weighted Bodyweight' },
+  { id: 'donkey-calf-raise', name: 'Donkey Calf Raise', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'drag-curl', name: 'Drag Curl', bodyPart: 'Arms', category: 'Barbell' },
+  { id: 'elliptical', name: 'Elliptical', bodyPart: 'Cardio', category: 'Cardio' },
+  { id: 'face-pull', name: 'Face Pull', bodyPart: 'Shoulders', category: 'Machine/Other' },
+  { id: 'farmers-walk', name: "Farmer's Walk", bodyPart: 'Full Body', category: 'Dumbbell' },
+  { id: 'floor-press', name: 'Floor Press', bodyPart: 'Chest', category: 'Barbell' },
+  { id: 'front-squat', name: 'Front Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'glute-bridge', name: 'Glute Bridge', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'goblet-squat', name: 'Goblet Squat', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'good-morning', name: 'Good Morning', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'good-morning-dumbbell', name: 'Good Morning (Dumbbell)', bodyPart: 'Back', category: 'Dumbbell' },
+  { id: 'hack-squat', name: 'Hack Squat', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'hamstring-curl-lying', name: 'Hamstring Curl - Lying', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'hamstring-curl-seated', name: 'Hamstring Curl - Seated', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'hanging-leg-raise', name: 'Hanging Leg Raise', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'hip-thrust', name: 'Hip Thrust', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'horizontal-leg-press', name: 'Horizontal Leg Press', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'hyperextension', name: 'Hyperextension', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'incline-curl-dumbbell', name: 'Incline Curl (Dumbbell)', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'incline-press-barbell', name: 'Incline Press (Barbell)', bodyPart: 'Chest', category: 'Barbell' },
+  { id: 'incline-press-dumbbell', name: 'Incline Press (Dumbbell)', bodyPart: 'Chest', category: 'Dumbbell' },
+  { id: 'inverted-row', name: 'Inverted Row', bodyPart: 'Back', category: 'Weighted Bodyweight' },
+  { id: 'jefferson-curl', name: 'Jefferson Curl', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'jm-press', name: 'JM Press', bodyPart: 'Arms', category: 'Barbell' },
+  { id: 'jump-rope', name: 'Jump Rope', bodyPart: 'Cardio', category: 'Cardio' },
+  { id: 'kettlebell-swing', name: 'Kettlebell Swing', bodyPart: 'Full Body', category: 'Dumbbell' },
+  { id: 'kroc-row', name: 'Kroc Row', bodyPart: 'Back', category: 'Dumbbell' },
+  { id: 'landmine-press', name: 'Landmine Press', bodyPart: 'Shoulders', category: 'Barbell' },
+  { id: 'landmine-row', name: 'Landmine Row', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'lat-pulldown-close', name: 'Lat Pulldown - Close Grip', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'lat-pulldown-wide', name: 'Lat Pulldown - Wide Grip', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'lateral-raise-cable', name: 'Lateral Raise (Cable)', bodyPart: 'Shoulders', category: 'Machine/Other' },
+  { id: 'lateral-raise-dumbbell', name: 'Lateral Raise (Dumbbell)', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'lateral-raise-machine', name: 'Lateral Raise (Machine)', bodyPart: 'Shoulders', category: 'Machine/Other' },
+  { id: 'leg-extension', name: 'Leg Extension', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'leg-press', name: 'Leg Press', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'leg-press-single', name: 'Leg Press (Single Leg)', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'lying-leg-raise', name: 'Lying Leg Raise', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'lunge-reverse', name: 'Reverse Lunge', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'lunge-static', name: 'Static Lunge', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'lunge-walking', name: 'Walking Lunge', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'meadows-row', name: 'Meadows Row', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'meadows-row-dumbbell', name: 'Meadows Row (Dumbbell)', bodyPart: 'Back', category: 'Dumbbell' },
+  { id: 'meadows-shrug', name: 'Meadows Shrug', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'muscle-up', name: 'Muscle-Up', bodyPart: 'Full Body', category: 'Weighted Bodyweight' },
+  { id: 'muscle-up-assisted', name: 'Muscle-Up (Assisted)', bodyPart: 'Full Body', category: 'Assisted Bodyweight' },
+  { id: 'nordic-curl', name: 'Nordic Curl', bodyPart: 'Legs', category: 'Assisted Bodyweight' },
+  { id: 'overhead-press-barbell', name: 'Overhead Press (Barbell)', bodyPart: 'Shoulders', category: 'Barbell' },
+  { id: 'overhead-press-dumbbell', name: 'Overhead Press (Dumbbell)', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'overhead-press-push', name: 'Push Press', bodyPart: 'Shoulders', category: 'Barbell' },
+  { id: 'overhead-squat', name: 'Overhead Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'pallof-press', name: 'Pallof Press', bodyPart: 'Core', category: 'Machine/Other' },
+  { id: 'pause-squat', name: 'Pause Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'pendlay-row', name: 'Pendlay Row', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'pendulum-squat', name: 'Pendulum Squat', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'pin-squat', name: 'Pin Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'plank', name: 'Plank', bodyPart: 'Core', category: 'Duration' },
+  { id: 'plank-side', name: 'Side Plank', bodyPart: 'Core', category: 'Duration' },
+  { id: 'power-clean', name: 'Power Clean', bodyPart: 'Olympic', category: 'Barbell' },
+  { id: 'preacher-curl', name: 'Preacher Curl', bodyPart: 'Arms', category: 'Barbell' },
+  { id: 'pseudo-planche-push-up', name: 'Pseudo Planche Push-Up', bodyPart: 'Other', category: 'Reps Only' },
+  { id: 'pull-up', name: 'Pull-Up', bodyPart: 'Back', category: 'Weighted Bodyweight' },
+  { id: 'pull-up-assisted', name: 'Pull-Up (Assisted)', bodyPart: 'Back', category: 'Assisted Bodyweight' },
+  { id: 'pullover-dumbbell', name: 'Pullover (Dumbbell)', bodyPart: 'Chest', category: 'Dumbbell' },
+  { id: 'push-up', name: 'Push-Up', bodyPart: 'Chest', category: 'Reps Only' },
+  { id: 'push-up-decline', name: 'Decline Push-Up', bodyPart: 'Chest', category: 'Reps Only' },
+  { id: 'push-up-diamond', name: 'Diamond Push-Up', bodyPart: 'Arms', category: 'Reps Only' },
+  { id: 'push-up-incline', name: 'Incline Push-Up', bodyPart: 'Chest', category: 'Reps Only' },
+  { id: 'rear-delt-fly-dumbbell', name: 'Rear Delt Fly (Dumbbell)', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'rear-delt-fly-machine', name: 'Rear Delt Fly (Machine)', bodyPart: 'Shoulders', category: 'Machine/Other' },
+  { id: 'reverse-fly-dumbbell', name: 'Reverse Fly (Dumbbell)', bodyPart: 'Back', category: 'Dumbbell' },
+  { id: 'reverse-hyperextension', name: 'Reverse Hyperextension', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'reverse-lunge', name: 'Reverse Lunge', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'reverse-pec-deck', name: 'Reverse Pec Deck', bodyPart: 'Shoulders', category: 'Machine/Other' },
+  { id: 'roman-deadlift-dumbbell', name: 'Romanian Deadlift (Dumbbell)', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'rowing-machine', name: 'Rowing Machine', bodyPart: 'Cardio', category: 'Cardio' },
+  { id: 'row-barbell-bent-over', name: 'Bent Over Row (Barbell)', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'row-cable-seated', name: 'Seated Cable Row', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'row-chest-supported', name: 'Chest Supported Row', bodyPart: 'Back', category: 'Machine/Other' },
+  { id: 'row-dumbbell-single', name: 'Single Arm Row (Dumbbell)', bodyPart: 'Back', category: 'Dumbbell' },
+  { id: 'row-t-bar', name: 'T-Bar Row', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'russian-twist', name: 'Russian Twist', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'running-treadmill', name: 'Running (Treadmill)', bodyPart: 'Cardio', category: 'Cardio' },
+  { id: 'scarecrow', name: 'Scarecrow', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'seal-row', name: 'Seal Row', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'seated-calf-raise-machine', name: 'Seated Calf Raise (Machine)', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'shrug-barbell', name: 'Shrug (Barbell)', bodyPart: 'Shoulders', category: 'Barbell' },
+  { id: 'shrug-dumbbell', name: 'Shrug (Dumbbell)', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'sissy-squat', name: 'Sissy Squat', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'sissy-squat-machine', name: 'Sissy Squat (Machine)', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'sit-up', name: 'Sit-Up', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'skullcrusher', name: 'Skullcrusher', bodyPart: 'Arms', category: 'Barbell' },
+  { id: 'sled-pull', name: 'Sled Pull', bodyPart: 'Full Body', category: 'Machine/Other' },
+  { id: 'sled-push', name: 'Sled Push', bodyPart: 'Full Body', category: 'Machine/Other' },
+  { id: 'snatch', name: 'Snatch', bodyPart: 'Olympic', category: 'Barbell' },
+  { id: 'spider-curl', name: 'Spider Curl', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'spoto-press', name: 'Spoto Press', bodyPart: 'Chest', category: 'Barbell' },
+  { id: 'squat-back', name: 'Back Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'squat-box', name: 'Box Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'squat-front', name: 'Front Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'standing-calf-raise-machine', name: 'Standing Calf Raise (Machine)', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'standing-leg-curl', name: 'Standing Leg Curl', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'stairmaster', name: 'StairMaster', bodyPart: 'Cardio', category: 'Cardio' },
+  { id: 'static-lunge', name: 'Static Lunge', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'step-up', name: 'Step-Up', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'svend-press', name: 'Svend Press', bodyPart: 'Chest', category: 'Dumbbell' },
+  { id: 'tempo-squat', name: 'Tempo Squat', bodyPart: 'Legs', category: 'Barbell' },
+  { id: 'thruster', name: 'Thruster', bodyPart: 'Full Body', category: 'Barbell' },
+  { id: 'tibialis-raise', name: 'Tibialis Raise', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'toes-to-bar', name: 'Toes to Bar', bodyPart: 'Core', category: 'Reps Only' },
+  { id: 'tricep-extension-cable', name: 'Tricep Pushdown (Cable)', bodyPart: 'Arms', category: 'Machine/Other' },
+  { id: 'tricep-extension-dumbbell', name: 'Tricep Extension (Dumbbell)', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'tricep-extension-overhead', name: 'Overhead Tricep Extension', bodyPart: 'Arms', category: 'Dumbbell' },
+  { id: 'turkish-get-up', name: 'Turkish Get-Up', bodyPart: 'Full Body', category: 'Dumbbell' },
+  { id: 'upright-row-barbell', name: 'Upright Row (Barbell)', bodyPart: 'Shoulders', category: 'Barbell' },
+  { id: 'upright-row-dumbbell', name: 'Upright Row (Dumbbell)', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'v-squat', name: 'V-Squat', bodyPart: 'Legs', category: 'Machine/Other' },
+  { id: 'wall-sit', name: 'Wall Sit', bodyPart: 'Legs', category: 'Duration' },
+  { id: 'walking-lunge', name: 'Walking Lunge', bodyPart: 'Legs', category: 'Dumbbell' },
+  { id: 'w-raise-dumbbell', name: 'W-Raise (Dumbbell)', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'woodchop-cable', name: 'Woodchop (Cable)', bodyPart: 'Core', category: 'Machine/Other' },
+  { id: 'yates-row', name: 'Yates Row', bodyPart: 'Back', category: 'Barbell' },
+  { id: 'y-raise-dumbbell', name: 'Y-Raise (Dumbbell)', bodyPart: 'Shoulders', category: 'Dumbbell' },
+  { id: 'z-press', name: 'Z-Press', bodyPart: 'Shoulders', category: 'Barbell' },
+];
+
+export const EXERCISES: Exercise[] = [..._EXERCISES].sort((a, b) =>
+  a.name.localeCompare(b.name)
+);
