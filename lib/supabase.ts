@@ -30,9 +30,7 @@ const webStorage = {
 
 let client: SupabaseClient | null = null;
 
-export function getSupabaseClient(): SupabaseClient {
-  if (client) return client;
-
+function createSupabaseClient(): SupabaseClient {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       'Missing Supabase environment variables. ' +
@@ -40,7 +38,7 @@ export function getSupabaseClient(): SupabaseClient {
     );
   }
 
-  client = createClient(supabaseUrl, supabaseAnonKey, {
+  return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       storage: Platform.OS === 'web' ? webStorage : AsyncStorage,
       autoRefreshToken: true,
@@ -48,14 +46,20 @@ export function getSupabaseClient(): SupabaseClient {
       detectSessionInUrl: false,
     },
   });
+}
 
+/** Lazy singleton getter */
+export function getSupabaseClient(): SupabaseClient {
+  if (!client) {
+    client = createSupabaseClient();
+  }
   return client;
 }
 
-/** Backwards-compatible direct export — lazily resolved */
-export const supabase = new Proxy({} as SupabaseClient, {
-  get(_target, prop) {
-    const instance = getSupabaseClient();
-    return (instance as any)[prop];
-  },
-});
+/** Direct export — lazily resolves common methods */
+export const supabase: SupabaseClient = {
+  get auth() { return getSupabaseClient().auth; },
+  get from() { return getSupabaseClient().from.bind(getSupabaseClient()); },
+  get channel() { return getSupabaseClient().channel.bind(getSupabaseClient()); },
+  get removeChannel() { return getSupabaseClient().removeChannel.bind(getSupabaseClient()); },
+} as unknown as SupabaseClient;
