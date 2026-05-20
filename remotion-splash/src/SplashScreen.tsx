@@ -1,4 +1,4 @@
-import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate, spring, Easing } from "remotion";
+import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate, Easing } from "remotion";
 import { LogoDrop } from "./LogoDrop";
 import { Particles } from "./Particles";
 import { Shockwave } from "./Shockwave";

@@ -13,7 +13,7 @@ import { useUser } from '@/context/UserContext';
 import { getTierColor } from '@/constants/ranks';
 import { RankIcon } from '@/components/RankIcon';
 import { AVATARS } from '@/constants/avatars';
-import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
+import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 
 export function ProfileHeader() {
   const Colors = useTheme();

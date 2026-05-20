@@ -401,7 +401,7 @@ export default function WorkoutScreen() {
         {liftedTemplate && (
           <View style={styles.liftHint}>
             <Text style={[styles.liftHintText, { color: Colors.primary }]}>
-              Tap a folder to move "{liftedTemplate.name}"
+              Tap a folder to move &quot;{liftedTemplate.name}&quot;
             </Text>
             <TouchableOpacity
               onPress={handleCancelLift}

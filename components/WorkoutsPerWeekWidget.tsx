@@ -113,7 +113,7 @@ export function WorkoutsPerWeekWidget() {
     ]);
 
     animControllerRef.current.start();
-  }, [user.weeklyHistory, user.weeklyTarget]);
+  }, [user.weeklyHistory]);
 
   // Only animate when the Profile screen comes into focus
   useFocusEffect(

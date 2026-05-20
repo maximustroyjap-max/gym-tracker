@@ -13,7 +13,6 @@ import {
   TextInput,
   Modal,
   Pressable,
-  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';

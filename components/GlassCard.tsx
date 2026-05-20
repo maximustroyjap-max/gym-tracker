@@ -24,7 +24,7 @@ import { View, StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from 'react-
 import { BlurView } from 'expo-blur';
 import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
-import { radius, spacing } from '@/constants/design';
+import { radius } from '@/constants/design';
 
 interface GlassCardProps {
   children: React.ReactNode;

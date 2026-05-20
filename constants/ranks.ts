@@ -10,7 +10,7 @@
  * later tiers require significantly more points.
  */
 
-import { User, WorkoutHistoryEntry, WeeklyWorkout, ThemeName } from '@/types/user';
+import { User, WeeklyWorkout, ThemeName } from '@/types/user';
 
 export const SUB_TIERS = [
   'Bronze 1',

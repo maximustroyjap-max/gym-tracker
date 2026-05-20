@@ -472,7 +472,7 @@ function AboutTab({
             ]}>
             <IconSymbol name="doc.text" size={28} color={Colors.textSecondary + '50'} />
             <Text style={[styles.emptyCardText, { color: Colors.textSecondary }]}>
-              We don't have any instructions for this exercise.
+              We don&apos;t have any instructions for this exercise.
             </Text>
           </View>
         ) : (

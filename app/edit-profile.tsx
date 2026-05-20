@@ -11,7 +11,7 @@ import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
-import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
+import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 import { AVATARS } from '@/constants/avatars';
 
 

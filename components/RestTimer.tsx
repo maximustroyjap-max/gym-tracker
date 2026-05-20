@@ -18,7 +18,7 @@ import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/context/ThemeContext';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { spacing, radius, typography } from '@/constants/design';
+import { spacing, typography } from '@/constants/design';
 
 interface RestTimerProps {
   /** Seconds remaining */

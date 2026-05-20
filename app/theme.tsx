@@ -5,15 +5,15 @@
 
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemeName } from '@/types/user';
 import { themes, ThemeColors } from '@/constants/theme';
-import { TAB_BAR_TOTAL_HEIGHT } from '@/components/CurvedTabBar';
-import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
+
+import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 
 interface ThemeOption {
   name: ThemeName;
@@ -31,7 +31,7 @@ const THEME_OPTIONS: ThemeOption[] = [
 export default function ThemeScreen() {
   const { user, updateUser } = useUser();
   const Colors = useTheme();
-  const insets = useSafeAreaInsets();
+
   const [selected, setSelected] = useState<ThemeName>(user.theme);
 
   const hasChanges = selected !== user.theme;

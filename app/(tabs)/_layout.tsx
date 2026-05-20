@@ -8,11 +8,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { CurvedTabBar } from '@/components/CurvedTabBar';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useTheme } from '@/context/ThemeContext';
-
 export default function TabLayout() {
-  const Colors = useTheme();
-
   return (
     <Tabs
       tabBar={(props) => <CurvedTabBar {...props} />}

@@ -20,7 +20,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Dimensions,
   Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,7 +29,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const TOGGLE_W = 280;
 const TOGGLE_HALF = TOGGLE_W / 2;
 const PILL_W = TOGGLE_HALF - 8;

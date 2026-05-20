@@ -8,13 +8,12 @@
 import { Platform } from 'react-native';
 
 let Audio: any;
-let AVPlaybackStatus: any;
 
 // Lazy-load expo-av only on native
 if (Platform.OS !== 'web') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const expoAv = require('expo-av');
   Audio = expoAv.Audio;
-  AVPlaybackStatus = expoAv.AVPlaybackStatus;
 }
 
 let audioModeConfigured = false;
@@ -107,7 +106,7 @@ export async function playAlertSound(soundId: string) {
 
     activeSounds.add(sound);
 
-    sound.setOnPlaybackStatusUpdate((status: typeof AVPlaybackStatus) => {
+    sound.setOnPlaybackStatusUpdate((status: any) => {
       if (!status.isLoaded) return;
       if (status.didJustFinish) {
         activeSounds.delete(sound);

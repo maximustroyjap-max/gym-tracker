@@ -18,7 +18,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { calculateWeeklyStreak } from '@/constants/ranks';
-import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
+import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 
 const WEEKLY_OPTIONS = [2, 3, 4, 5, 6, 7];
 
