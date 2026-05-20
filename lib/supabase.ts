@@ -1,8 +1,8 @@
 /**
  * SUPABASE CLIENT
- * Lazy singleton — only created on first use, not during static export build.
- * On native: uses AsyncStorage for session persistence.
- * On web: uses localStorage safely (guarded for SSR/static export).
+ * Lazy singleton — only created on first use.
+ * During static export (no env vars): returns a mock client so the build doesn't crash.
+ * At runtime (env vars present): returns the real Supabase client.
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -30,7 +30,38 @@ const webStorage = {
 
 let client: SupabaseClient | null = null;
 
-function createSupabaseClient(): SupabaseClient {
+/** Mock client for static export builds (no env vars available) */
+function createMockClient(): SupabaseClient {
+  const noop = () => Promise.resolve({ data: null, error: null } as any);
+  const emptyQuery = () => ({
+    select: () => emptyQuery(),
+    insert: noop,
+    update: () => ({ eq: noop }),
+    delete: () => ({ eq: noop }),
+    eq: () => emptyQuery(),
+    single: noop,
+    order: () => emptyQuery(),
+    limit: () => emptyQuery(),
+    data: null,
+    error: null,
+  });
+
+  return {
+    auth: {
+      getSession: () => Promise.resolve({ data: { session: null }, error: null } as any),
+      signInWithPassword: noop,
+      signUp: noop,
+      signOut: noop,
+      onAuthStateChange: () => ({ subscription: { unsubscribe: () => {} }, data: {} } as any),
+      getUser: () => Promise.resolve({ data: { user: null }, error: null } as any),
+    },
+    from: () => emptyQuery(),
+    channel: () => ({ on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }) }),
+    removeChannel: () => {},
+  } as unknown as SupabaseClient;
+}
+
+function createRealClient(): SupabaseClient {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       'Missing Supabase environment variables. ' +
@@ -50,9 +81,15 @@ function createSupabaseClient(): SupabaseClient {
 
 /** Lazy singleton getter */
 export function getSupabaseClient(): SupabaseClient {
-  if (!client) {
-    client = createSupabaseClient();
+  if (client) return client;
+
+  // During static export, env vars are not available — use mock client
+  if (!supabaseUrl || !supabaseAnonKey) {
+    client = createMockClient();
+    return client;
   }
+
+  client = createRealClient();
   return client;
 }
 
