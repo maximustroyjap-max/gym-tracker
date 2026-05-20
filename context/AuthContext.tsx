@@ -5,6 +5,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
@@ -27,6 +28,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Listen to auth state changes + check initial session
   useEffect(() => {
     let mounted = true;
+
+    // Skip during SSR/static export (window is undefined in Node.js)
+    if (Platform.OS === 'web' && typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
 
     // Check for existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {

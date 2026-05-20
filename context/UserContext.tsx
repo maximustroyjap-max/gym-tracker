@@ -7,6 +7,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { User, DEFAULT_USER, createEmptyUser } from '@/types/user';
 import { calculateFitnessScore, getTierForScore, calculateWeeklyStreak } from '@/constants/ranks';
@@ -105,6 +106,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function loadUser() {
+    // Skip during SSR/static export
+    if (Platform.OS === 'web' && typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -185,6 +192,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const newUser = { ...user, ...updates };
     setUser(newUser);
 
+    // Skip during SSR/static export
+    if (Platform.OS === 'web' && typeof window === 'undefined') return;
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -208,6 +218,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   async function resetUser() {
     const emptyUser = createEmptyUser();
     setUser(emptyUser);
+
+    // Skip during SSR/static export
+    if (Platform.OS === 'web' && typeof window === 'undefined') return;
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
