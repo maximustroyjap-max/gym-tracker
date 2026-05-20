@@ -55,7 +55,7 @@ function isValidEmail(email: string): boolean {
 
 export default function AuthScreen() {
   const Colors = useTheme();
-  const { login, signup } = useAuth();
+  const { login, signup, authConfigError } = useAuth();
 
   const [isLogin, setIsLogin] = useState(true);
 
@@ -217,20 +217,20 @@ export default function AuthScreen() {
     setIsSubmitting(true);
     try {
       if (isLogin) {
-        const success = await login(email.trim().toLowerCase(), password);
-        if (!success) {
-          setError('Invalid email or password');
+        const result = await login(email.trim().toLowerCase(), password);
+        if (!result.success) {
+          setError(result.error || 'Invalid email or password');
         }
       } else {
         const targetNum = parseInt(weeklyTarget, 10) || 5;
-        const success = await signup(
+        const result = await signup(
           email.trim().toLowerCase(),
           password,
           displayName.trim(),
           targetNum
         );
-        if (!success) {
-          setError('Could not create account. This email may already be registered.');
+        if (!result.success) {
+          setError(result.error || 'Could not create account. This email may already be registered.');
         }
       }
     } finally {
@@ -384,6 +384,14 @@ export default function AuthScreen() {
                   <Text style={[styles.errorText, { color: Colors.secondary }]}>
                     {error}
                   </Text>
+                ) : null}
+
+                {authConfigError ? (
+                  <View style={[styles.configErrorBanner, { backgroundColor: Colors.danger + '18', borderColor: Colors.danger + '40' }]}>
+                    <Text style={[styles.configErrorText, { color: Colors.danger }]}>
+                      {authConfigError}
+                    </Text>
+                  </View>
                 ) : null}
 
                 {/* Submit Button */}
@@ -559,6 +567,18 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
     marginTop: spacing.xs,
+  },
+  configErrorBanner: {
+    padding: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    marginTop: spacing.sm,
+  },
+  configErrorText: {
+    fontSize: typography.sm,
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   submitButton: {
     paddingVertical: spacing.md,

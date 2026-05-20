@@ -29,6 +29,12 @@ const webStorage = {
 };
 
 let client: SupabaseClient | null = null;
+let mockClientFlag = false;
+
+/** Check if the current client is the mock (build-time fallback) */
+export function isMockClient(): boolean {
+  return mockClientFlag;
+}
 
 /** Mock client for static export builds (no env vars available) */
 function createMockClient(): SupabaseClient {
@@ -85,10 +91,12 @@ export function getSupabaseClient(): SupabaseClient {
 
   // During static export, env vars are not available — use mock client
   if (!supabaseUrl || !supabaseAnonKey) {
+    mockClientFlag = true;
     client = createMockClient();
     return client;
   }
 
+  mockClientFlag = false;
   client = createRealClient();
   return client;
 }

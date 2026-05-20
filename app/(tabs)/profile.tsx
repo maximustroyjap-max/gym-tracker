@@ -17,6 +17,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Animated,
+  Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -152,7 +153,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: 'transparent' }]
+      style={[styles.safeArea, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]
       }
       edges={['top']}>
       <ScrollView

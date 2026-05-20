@@ -21,6 +21,7 @@ import {
   Animated,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TAB_BAR_TOTAL_HEIGHT } from '@/components/CurvedTabBar';
@@ -232,7 +233,7 @@ export default function WorkoutScreen() {
     activeTemplatePreview !== null;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]} edges={['top']}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl }]}

@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Modal,
+  Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TAB_BAR_TOTAL_HEIGHT } from '@/components/CurvedTabBar';
@@ -291,7 +292,7 @@ export default function HistoryScreen() {
   const history = user.workoutHistory;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.title, { color: Colors.text }]}>History</Text>

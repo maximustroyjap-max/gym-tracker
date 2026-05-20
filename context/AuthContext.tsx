@@ -6,15 +6,16 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Platform } from 'react-native';
-import { supabase } from '@/lib/supabase';
+import { supabase, isMockClient } from '@/lib/supabase';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: SupabaseUser | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string, username: string, weeklyTarget: number) => Promise<boolean>;
+  authConfigError: string | null;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, username: string, weeklyTarget: number) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [authConfigError, setAuthConfigError] = useState<string | null>(null);
 
   // Listen to auth state changes + check initial session
   useEffect(() => {
@@ -31,6 +33,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Skip during SSR/static export (window is undefined in Node.js)
     if (Platform.OS === 'web' && typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+
+    // Detect mock client (missing env vars → auth won't work)
+    if (isMockClient()) {
+      setAuthConfigError(
+        'Auth is not configured. Please set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY environment variables.'
+      );
       setIsLoading(false);
       return;
     }
@@ -61,13 +72,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string) => {
+    if (isMockClient()) {
+      return { success: false, error: 'Auth is not configured. Check your environment variables.' };
+    }
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
-    return !error;
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
   }, []);
 
   const signup = useCallback(
-    async (email: string, password: string, username: string, weeklyTarget: number): Promise<boolean> => {
+    async (email: string, password: string, username: string, weeklyTarget: number) => {
+      if (isMockClient()) {
+        return { success: false, error: 'Auth is not configured. Check your environment variables.' };
+      }
       const { data, error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
@@ -76,8 +96,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
-      if (error || !data.user) {
-        return false;
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      if (!data.user) {
+        return { success: false, error: 'Signup failed. Please try again.' };
       }
 
       // Update profile with the user's chosen weekly target
@@ -87,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .update({ weekly_target: weeklyTarget })
         .eq('id', data.user.id);
 
-      return true;
+      return { success: true };
     },
     []
   );
@@ -102,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
         isLoading,
         user,
+        authConfigError,
         login,
         signup,
         logout,

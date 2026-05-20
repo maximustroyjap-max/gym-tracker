@@ -177,7 +177,7 @@ export default function ExercisesScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.pageTitle, { color: Colors.text }]}>Exercises</Text>
