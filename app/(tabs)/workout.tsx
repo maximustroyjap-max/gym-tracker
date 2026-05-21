@@ -372,7 +372,7 @@ export default function WorkoutScreen() {
             </View>
             <View style={styles.cardGrid}>
               {getTemplatesInFolder(expandedFolderId).map((template) => (
-                <View key={template.id} style={{ width: '47.5%' }}>
+                <View key={template.id} style={styles.templateCardWrapper}>
                   <TemplateCard
                     template={template}
                     onPress={() => setActiveTemplatePreview(template)}
@@ -419,7 +419,7 @@ export default function WorkoutScreen() {
               key={template.id}
               ref={setTemplateRef(template.id)}
               style={[
-                { width: '47.5%' },
+                styles.templateCardWrapper,
                 liftedTemplate?.id === template.id && {
                   transform: [{ scale: liftScale }],
                   zIndex: 10,
@@ -450,7 +450,7 @@ export default function WorkoutScreen() {
 
         <View style={styles.cardGrid}>
           {EXAMPLE_TEMPLATES.map((template) => (
-            <View key={template.id} style={{ width: '47.5%' }}>
+            <View key={template.id} style={styles.templateCardWrapper}>
               <TemplateCard
                 template={template}
                 onPress={() => setActiveTemplatePreview(template)}
@@ -741,6 +741,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.md,
     marginBottom: spacing.xl,
+  },
+  templateCardWrapper: {
+    flex: 1,
+    minWidth: '45%',
   },
   card: {
     width: '100%',

@@ -523,13 +523,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    paddingHorizontal: spacing.lg,
     // paddingBottom is set dynamically via inline style
   },
   settingsHeader: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
   },
   settingsButton: {
@@ -571,12 +571,12 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: spacing.lg,
     gap: spacing.md,
     marginTop: spacing.sm,
   },
   statCard: {
-    width: '47%',
+    flex: 1,
+    minWidth: '45%',
     overflow: 'hidden',
   },
   statCardContent: {
@@ -613,7 +613,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: spacing.lg,
     marginTop: spacing['2xl'],
     marginBottom: spacing.xs,
   },
@@ -633,7 +632,6 @@ const styles = StyleSheet.create({
   },
   rankSection: {
     marginTop: spacing['2xl'],
-    marginHorizontal: spacing.lg,
     overflow: 'hidden',
   },
   rankSectionContent: {
@@ -670,7 +668,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   goalCard: {
-    marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     overflow: 'hidden',
   },

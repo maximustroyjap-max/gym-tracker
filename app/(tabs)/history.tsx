@@ -13,9 +13,9 @@ import {
   FlatList,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   Modal,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TAB_BAR_TOTAL_HEIGHT } from '@/components/CurvedTabBar';
@@ -25,10 +25,12 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { WorkoutHistoryEntry, HistoryExercise } from '@/types/user';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const DAY_GAP = 6;
-const AVAILABLE_WIDTH = SCREEN_WIDTH - 64;
-const DAY_CELL_SIZE = Math.floor((AVAILABLE_WIDTH - 6 * DAY_GAP) / 7);
+
+function computeDayCellSize(screenWidth: number): number {
+  const availableWidth = screenWidth - 64;
+  return Math.floor((availableWidth - 6 * DAY_GAP) / 7);
+}
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -82,6 +84,8 @@ interface CalendarModalProps {
 }
 
 function CalendarModal({ visible, onClose, workoutHistory, Colors }: CalendarModalProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const dayCellSize = computeDayCellSize(screenWidth);
   const today = useMemo(() => new Date(), []);
   const todayKey = useMemo(() => toDateKey(today), [today]);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -176,6 +180,7 @@ function CalendarModal({ visible, onClose, workoutHistory, Colors }: CalendarMod
                 workoutDateSet={workoutDateSet}
                 todayKey={todayKey}
                 Colors={Colors}
+                dayCellSize={dayCellSize}
                 onLayout={(y) => handleMonthLayout(year, month, y)}
               />
             ))}
@@ -192,6 +197,7 @@ function MonthGrid({
   workoutDateSet,
   todayKey,
   Colors,
+  dayCellSize,
   onLayout,
 }: {
   year: number;
@@ -199,6 +205,7 @@ function MonthGrid({
   workoutDateSet: Set<string>;
   todayKey: string;
   Colors: ReturnType<typeof useTheme>;
+  dayCellSize: number;
   onLayout?: (y: number) => void;
 }) {
   const daysInMonth = getDaysInMonth(year, month);
@@ -218,7 +225,7 @@ function MonthGrid({
             key={i}
             style={[
               styles.dayHeaderText,
-              { color: Colors.textSecondary, width: DAY_CELL_SIZE },
+              { color: Colors.textSecondary, width: dayCellSize },
             ]}>
             {day}
           </Text>
@@ -230,7 +237,7 @@ function MonthGrid({
         {Array.from({ length: totalCells }).map((_, index) => {
           const dayNumber = index - startOffset + 1;
           if (dayNumber < 1 || dayNumber > daysInMonth) {
-            return <View key={index} style={styles.dayCell} />;
+            return <View key={index} style={[styles.dayCell, { width: dayCellSize, height: dayCellSize }]} />;
           }
 
           const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
@@ -238,12 +245,12 @@ function MonthGrid({
           const isToday = dateKey === todayKey;
 
           return (
-            <View key={index} style={styles.dayCell}>
+            <View key={index} style={[styles.dayCell, { width: dayCellSize, height: dayCellSize }]}>
               {hasWorkout ? (
                 <View
                   style={[
                     styles.workoutDayCircle,
-                    { backgroundColor: Colors.primary },
+                    { backgroundColor: Colors.primary, width: dayCellSize, height: dayCellSize, borderRadius: dayCellSize / 2 },
                   ]}>
                   <Text style={[styles.workoutDayText, { color: Colors.background }]}>
                     {dayNumber}
@@ -256,7 +263,7 @@ function MonthGrid({
                 <View
                   style={[
                     styles.todayCircle,
-                    { borderColor: Colors.text },
+                    { borderColor: Colors.text, width: dayCellSize, height: dayCellSize, borderRadius: dayCellSize / 2 },
                   ]}>
                   <Text style={[styles.todayText, { color: Colors.text }]}>
                     {dayNumber}
@@ -712,8 +719,6 @@ const styles = StyleSheet.create({
     gap: DAY_GAP,
   },
   dayCell: {
-    width: DAY_CELL_SIZE,
-    height: DAY_CELL_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -722,9 +727,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   workoutDayCircle: {
-    width: DAY_CELL_SIZE,
-    height: DAY_CELL_SIZE,
-    borderRadius: DAY_CELL_SIZE / 2,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -744,9 +746,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   todayCircle: {
-    width: DAY_CELL_SIZE,
-    height: DAY_CELL_SIZE,
-    borderRadius: DAY_CELL_SIZE / 2,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
