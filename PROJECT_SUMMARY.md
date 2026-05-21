@@ -4,7 +4,7 @@
 
 A **gamified gym tracker mobile + web app** for iPhone, Android, and Web browsers built with **React Native + Expo**. The app has 5 bottom tabs: **Home** (fitness score overview), **Workout** (templates + live session), **Exercises** (A-Z library with search/filters), **History** (completed workouts + calendar), and **Profile** (stats/dashboard/rank system). Features include a **16-tier Solo League Rank System** with Fitness Score (4 pillars), **PR detection**, **workout history with calendar**, **150+ exercise library**, **custom exercise creation**, **configurable rest timer** with alert sounds, **5 themes**, **dynamic settings suite**, **body measurements with BMI**, **goals tracking**, **10 custom avatar images**, and a **Login/Signup auth flow**.
 
-**NEW:** The app is now a **dual-platform app** (iOS/Android native + Web PWA) with **Supabase** as the cloud backend for auth, data persistence, and multi-device sync. Deployed via **Vercel**.
+**NEW:** The app is now a **dual-platform app** (iOS/Android native + Web PWA) with **Supabase** as the cloud backend for auth, data persistence, and multi-device sync. Deployed via **Netlify**.
 
 ---
 
@@ -44,7 +44,7 @@ A **gamified gym tracker mobile + web app** for iPhone, Android, and Web browser
 - `utils/sound.ts` — HTML5 Audio API fallback on web, `expo-av` on native
 - `components/AnimatedSplashScreen.tsx` — Static branded screen with fade animation on web (no video). MP4 video unchanged on native.
 - `components/haptic-tab.tsx` + `components/CurvedTabBar.tsx` — Haptics only fire on native (`Platform.OS !== 'web'`)
-- `app/_layout.tsx` — StatusBar only renders on native. Desktop web gets centered 480px container with black background so the mobile UI doesn't stretch on large monitors.
+- `app/_layout.tsx` — StatusBar only renders on native. App fills 100% width/height on all screen sizes (no centered container).
 - `lib/supabase.ts` — `webStorage` adapter guards `localStorage` with `typeof window !== 'undefined'` for SSR safety
 
 **Phase 5: Privacy Policy Rewrite (`app/privacy-policy.tsx`)**
@@ -57,17 +57,87 @@ A **gamified gym tracker mobile + web app** for iPhone, Android, and Web browser
 - Hero subtitle: "Your data is secure, encrypted, and always under your control."
 - Last updated: June 2026
 
-**Phase 6: Vercel Deployment**
-- Created `vercel.json` — build command, output directory (`dist`), SPA rewrites for client-side routing
+**Phase 6: Netlify Deployment**
+- Created `netlify.toml` — build command (`npx expo export --platform web`), publish directory (`dist`), SPA redirects (`/*` → `/index.html`)
 - `app.json` already had `"web": { "output": "static" }`
 - Web export builds successfully (`npx expo export --platform web`) — 25 routes, ~2.6MB bundle
-- Deployed to Vercel with auto-deploy on every GitHub push
+- Deployed to Netlify with auto-deploy on every GitHub push
+- Environment variables set in Netlify dashboard: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
 
 **Supabase Project Details:**
 - **Project URL:** `https://rrepsekxwiqlwuglyhbp.supabase.co`
 - **Anon Key:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyZXBzZWt4d2lxbHd1Z2x5aGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNjkxODksImV4cCI6MjA5NDc0NTE4OX0.RRGFjSddu0w1reG-5Lp5argKq_sP3jm4C4JfDk_yyIM`
 - **Tables created:** `profiles` (with RLS + trigger for auto-profile creation on signup)
 - **Auth:** Email + Password (email confirmation disabled for easier onboarding)
+
+---
+
+### Recently Completed: Phase 7 — Final Verification
+
+**Goal:** Full TypeScript check + ESLint cleanup to ensure code quality before continuing.
+
+- `npx tsc --noEmit` — **0 errors**
+- `npx expo export --platform web` — builds successfully (25 routes)
+- Fixed 2 ESLint errors (unescaped entities in `workout.tsx`, `ExerciseDetailPopup.tsx`)
+- Removed ~12 unused variable/import warnings across: `_layout.tsx`, `auth.tsx`, `edit-profile.tsx`, `goals.tsx`, `help-support.tsx`, `rest-timer-settings.tsx`, `theme.tsx`, `CurvedTabBar.tsx`, `GlassCard.tsx`, `ProfileHeader.tsx`, `RestTimer.tsx`, `ranks.ts`, `SplashScreen.tsx`, `sound.ts`
+
+---
+
+### Recently Completed: Phase 8 — Auth Config Error Handling + Mock Client Detection
+
+**Problem:** When Supabase env vars are missing (e.g., Netlify build without env vars), the app silently falls back to a mock client. Login/Signup appears to do nothing.
+
+**Fix:**
+- `lib/supabase.ts` — Added `isMockClient()` export. Tracks whether the mock client is active.
+- `context/AuthContext.tsx` — Added `authConfigError` state. `login()` and `signup()` now return `{ success, error? }` objects with meaningful error messages instead of silent failures.
+- `app/auth.tsx` — Added red config error banner that shows when `authConfigError` is present. Updated form handling to work with new `{ success, error }` return format.
+
+---
+
+### Recently Completed: Phase 9 — Tab Screen Stacking Fix (Web)
+
+**Problem:** On web, tapping bottom tabs caused screens to stack/overlap because all 5 tab screens had `backgroundColor: 'transparent'` on their root containers. React Navigation on web didn't properly hide inactive transparent scenes.
+
+**Fix:**
+- All 5 tab screens (`index.tsx`, `profile.tsx`, `workout.tsx`, `exercises.tsx`, `history.tsx`) now use:
+  ```tsx
+  backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent'
+  ```
+- **Web:** Opaque backgrounds — inactive scenes are fully covered, no overlap
+- **Native:** Still transparent — AmbientBackground blobs still show through
+
+---
+
+### Recently Completed: Phase 10 — Fullscreen Native Web App
+
+**Problem:** App had a 480px centered desktop container with black bars. Zooming out showed white edges. Didn't feel like a native app on mobile browsers.
+
+**Fix:**
+- `app/_layout.tsx` — Removed desktop web centering block. App now fills **100% width/height** on all screen sizes via `View style={{ flex: 1, width: '100%', height: '100%' }}`.
+- `app/+html.tsx` — New custom HTML wrapper with:
+  - Viewport lock: `width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover`
+  - PWA meta tags: `apple-mobile-web-app-capable`, `mobile-web-app-capable`, `theme-color`
+  - Global CSS: `#0F0F0F` body background (no white flash), `overscroll-behavior: none` (no bounce), `-webkit-tap-highlight-color: transparent` (no gray tap highlights)
+  - Safe area support: `env(safe-area-inset-left/right)` for notched phones
+
+**Result:** App now feels like a real native app on mobile browsers — fullscreen, no zoom, no white edges, no overscroll bounce.
+
+---
+
+### Recently Completed: Phase 11 — PWA Installability
+
+**Goal:** Allow users to install the app directly to their home screen on iOS and Android without downloading from the App Store or Play Store.
+
+**What was done:**
+- Created `public/manifest.json` — Web App Manifest with app name, short name, description, `display: standalone`, theme/background colors, start URL, scope, and two icon sizes (192×192 and 512×512 maskable)
+- Generated PWA icons from `assets/images/splash-icon.png` (ASCENT "A" logo) using `sharp`:
+  - `public/icon-192.png` — Required by Chrome for install prompt
+  - `public/icon-512.png` — Maskable icon for Android adaptive shapes
+  - `public/apple-touch-icon.png` — 180×180 icon for iOS Safari "Add to Home Screen"
+- Updated `app/+html.tsx` — Added `<link rel="manifest">` and `<link rel="apple-touch-icon">`, plus `apple-mobile-web-app-title` meta tag
+- Expo static export automatically copies `public/` into `dist/`, so Netlify serves all PWA assets at root path
+
+**Result:** The app is now a fully installable PWA. Users can tap "Add to Home Screen" (iOS Safari) or use the install banner (Android Chrome). The app launches in `standalone` mode with no browser chrome, feeling identical to a native app.
 
 ---
 
@@ -245,7 +315,7 @@ All **8 settings sub-pages** redesigned with premium UI:
 | **react-native-reanimated** | Animations (~4.1.1) |
 | **react-native-svg** | SVG shapes for tab bar background + brand logo (15.12.1) |
 | **expo-haptics** | Haptic feedback on tab presses (native only) |
-| **Vercel** | Static web hosting for the web PWA build |
+| **Netlify** | Static web hosting for the web PWA build |
 
 ---
 
@@ -321,8 +391,15 @@ gym-tracker/
 │   │   └── beep.wav
 │   └── videos/
 │       └── splash-screen.mp4     # Splash screen entrance video (native only)
+├── public/                       # PWA assets (copied to dist/ on build)
+│   ├── manifest.json             # Web App Manifest
+│   ├── icon-192.png              # PWA icon (192×192)
+│   ├── icon-512.png              # PWA icon (512×512, maskable)
+│   └── apple-touch-icon.png      # iOS home screen icon (180×180)
+├── scripts/
+│   └── generate-pwa-icons.js     # One-time script to generate PWA icons from splash-icon.png
 ├── .env.local                    # Supabase env vars (gitignored)
-├── vercel.json                   # Vercel deployment config
+├── netlify.toml                  # Netlify deployment config
 └── package.json
 ```
 
@@ -536,7 +613,9 @@ Fitness Score = (Consistency × 0.40) + (Volume × 0.30) + (Progression × 0.20)
 
 ✅ **Dual Platform** — iOS/Android native app + Web PWA from same codebase
 
-✅ **Vercel Deployment** — Static web export with auto-deploy on GitHub push
+✅ **PWA Installable** — Users can add to home screen on iOS/Android without App Store / Play Store. Launches in standalone fullscreen mode.
+
+✅ **Netlify Deployment** — Static web export with auto-deploy on GitHub push
 
 ✅ **Login/Signup Auth Flow** — Supabase Auth with email/password. Splash screen always plays first.
 
@@ -594,20 +673,20 @@ npx expo start --web
 cd gym-tracker
 npx expo export --platform web
 ```
-Output goes to `dist/` — ready for Vercel.
+Output goes to `dist/` — ready for Netlify.
 
 ---
 
 ## Deployment
 
-**GitHub:** Code hosted at user's repository. Push to `master` branch triggers Vercel deploy.
+**GitHub:** Code hosted at user's repository. Push to `master` branch triggers Netlify deploy.
 
-**Vercel:** Connected to GitHub repo. Auto-deploys on every push.
+**Netlify:** Connected to GitHub repo. Auto-deploys on every push.
 - Build Command: `npx expo export --platform web`
-- Output Directory: `dist`
-- SPA Rewrites: All routes → `index.html` (handled by `vercel.json`)
+- Publish Directory: `dist`
+- SPA Redirects: `/*` → `/index.html` (handled by `netlify.toml`)
 
-**Environment Variables (set in Vercel dashboard):**
+**Environment Variables (set in Netlify dashboard):**
 ```
 EXPO_PUBLIC_SUPABASE_URL=https://rrepsekxwiqlwuglyhbp.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyZXBzZWt4d2lxbHd1Z2x5aGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNjkxODksImV4cCI6MjA5NDc0NTE4OX0.RRGFjSddu0w1reG-5Lp5argKq_sP3jm4C4JfDk_yyIM
@@ -645,7 +724,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 
 ## Important Notes for Next Chat
 
-1. **Platform:** iPhone, Android (Expo Go), and Web (PWA via Vercel)
+1. **Platform:** iPhone, Android (Expo Go), and Web (PWA via Netlify)
 2. **Data storage:** Supabase cloud (PostgreSQL). Local AsyncStorage is ONLY used as Supabase auth session adapter.
 3. **Navigation:** File-based with Expo Router. Files in `app/` = screens.
 4. **State management:**
@@ -655,7 +734,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
    - Theme colors: `ThemeContext` (`useTheme()` hook)
 5. **Colors:** Always use `useTheme()` in NEW components — NEVER import static `Colors`
 6. **User data shape:** Defined in `@/types/user.ts` — add new fields there FIRST, then `DEFAULT_USER`
-7. **Supabase client:** `lib/supabase.ts` — lazy singleton. Returns mock client during static export (no env vars), real client at runtime.
+7. **Supabase client:** `lib/supabase.ts` — lazy singleton. Returns mock client during static export (no env vars), real client at runtime. Export `isMockClient()` to detect mock mode.
 8. **Workout overlay:** Rendered at ROOT in `app/_layout.tsx`. `pointerEvents="box-none"` when minimized.
 9. **Rest timer:** Uses ref-based interval to avoid re-renders during drag gestures
 10. **Sound:** `utils/sound.ts` — `expo-av` on native, HTML5 Audio on web
@@ -685,4 +764,9 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 29. **Auth screen patterns:** Brand logo uses `logo-mountain-a.svg` (inline SVG via `react-native-svg`). Form card uses `borderTopRadius: 36` for curved separation. Toggle uses fixed 280px width with precise pill math (PILL_W = 132px, translateX 4→144px).
 30. **Web compatibility:** Always wrap native-only APIs (`expo-haptics`, `expo-status-bar`, `expo-av`) in `Platform.OS !== 'web'` checks. Use `lib/platform.ts` helpers.
 31. **SSR safety:** During static export, `typeof window === 'undefined'`. The Supabase client returns mock data. Contexts skip Supabase calls.
-32. **Vercel deploy:** Push to GitHub → Vercel auto-deploys. Env vars must be set in Vercel dashboard (not committed).
+32. **Netlify deploy:** Push to GitHub → Netlify auto-deploys. Env vars must be set in Netlify dashboard (not committed).
+33. **Auth error handling:** `AuthContext` exposes `authConfigError`. If Supabase env vars are missing, a red banner shows on the Auth screen instead of silent failure.
+34. **Tab screen backgrounds (web vs native):** Tab screens use `Platform.OS === 'web' ? Colors.background : 'transparent'` to prevent stacking on web while preserving AmbientBackground blobs on native.
+35. **Fullscreen web app:** `app/+html.tsx` locks viewport (`user-scalable=no`), removes overscroll bounce, sets tap-highlight transparent, and extends into safe areas. App fills 100% width/height on all devices.
+36. **Root layout:** `app/_layout.tsx` wraps all content in `View style={{ flex: 1, width: '100%', height: '100%' }}`. No desktop container.
+37. **PWA assets:** Files in `public/` are copied to `dist/` during static export. The manifest, icons, and apple-touch-icon are served at root path. Do not delete generated PNGs from `public/`.

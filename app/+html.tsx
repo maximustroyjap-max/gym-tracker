@@ -22,8 +22,13 @@ export default function Root({ children }: PropsWithChildren) {
         {/* PWA / native app feel */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="ASCENT" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#0F0F0F" />
+
+        {/* PWA manifest and icons */}
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         <ScrollViewStyleReset />
 
