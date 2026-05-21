@@ -36,17 +36,6 @@ function AppContent() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const isLightTheme = user.theme === 'light';
   const [splashComplete, setSplashComplete] = useState(false);
-  const [isDesktopWeb, setIsDesktopWeb] = useState(false);
-
-  // Safe window width check — only runs on client, not during static export
-  useEffect(() => {
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      const check = () => setIsDesktopWeb(window.innerWidth > 600);
-      check();
-      window.addEventListener('resize', check);
-      return () => window.removeEventListener('resize', check);
-    }
-  }, []);
 
   // Show splash until animation completes OR auth is still loading
   const showSplash = !splashComplete || authLoading;
@@ -84,18 +73,11 @@ function AppContent() {
     </>
   );
 
-  // On desktop web, center the app with a max-width for a mobile-like experience
-  if (Platform.OS === 'web' && isDesktopWeb) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center' }}>
-        <View style={{ width: 480, height: '100%', maxHeight: 900 }}>
-          {content}
-        </View>
-      </View>
-    );
-  }
-
-  return content;
+  return (
+    <View style={{ flex: 1, width: '100%', height: '100%' }}>
+      {content}
+    </View>
+  );
 }
 
 const transparentNavTheme = {
