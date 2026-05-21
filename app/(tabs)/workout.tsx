@@ -236,7 +236,7 @@ export default function WorkoutScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]} edges={['top']}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl, flexGrow: 1 }]}
         showsVerticalScrollIndicator={false}
         scrollEnabled={!liftedTemplate && !anyOverlayOpen}
         pointerEvents={anyOverlayOpen ? 'none' : 'auto'}>
@@ -448,7 +448,7 @@ export default function WorkoutScreen() {
           </Text>
         </View>
 
-        <View style={styles.cardGrid}>
+        <View style={[styles.cardGrid, { marginTop: 'auto' }]}>
           {EXAMPLE_TEMPLATES.map((template) => (
             <View key={template.id} style={styles.templateCardWrapper}>
               <TemplateCard

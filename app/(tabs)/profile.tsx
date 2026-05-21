@@ -160,7 +160,7 @@ export default function ProfileScreen() {
         style={styles.container}
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl },
+          { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl, flexGrow: 1 },
         ]}>
         {/* Settings gear — top right */}
         <View style={styles.settingsHeader}>
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   rankSection: {
-    marginTop: spacing['2xl'],
+    marginTop: 'auto',
     overflow: 'hidden',
   },
   rankSectionContent: {

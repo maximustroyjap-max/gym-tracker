@@ -271,7 +271,7 @@ export default function ExercisesScreen() {
         renderItem={renderExerciseItem}
         renderSectionHeader={renderSectionHeader}
         stickySectionHeadersEnabled={false}
-        contentContainerStyle={[styles.listContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl }]}
+        contentContainerStyle={[styles.listContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl, flexGrow: 1 }]}
         showsVerticalScrollIndicator={false}
         scrollEnabled={!selectedExercise}
         pointerEvents={selectedExercise ? 'none' : 'auto'}

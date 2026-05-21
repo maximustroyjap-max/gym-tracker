@@ -335,7 +335,7 @@ export default function HistoryScreen() {
         <FlatList
           data={history}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={[styles.listContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl }]}
+          contentContainerStyle={[styles.listContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl, flexGrow: 1 }]}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => <HistoryCard entry={item} Colors={Colors} />}
         />

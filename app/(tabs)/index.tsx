@@ -51,7 +51,7 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]} edges={['top']}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl, flexGrow: 1 }]}
         showsVerticalScrollIndicator={false}>
         {/* ── Minimal Header ── */}
         <View style={styles.headerRow}>
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   /* ── Actions ── */
   actionsColumn: {
     gap: spacing.md,
-    marginTop: spacing.xs,
+    marginTop: 'auto',
   },
   primaryButton: {
     flexDirection: 'row',
