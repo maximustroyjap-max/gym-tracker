@@ -162,7 +162,7 @@ export function CurvedTabBar({ state, descriptors, navigation, insets }: BottomT
           {
             top: BAR_TOP - BUBBLE_R - BUBBLE_RISE,
             backgroundColor: Colors.card,
-            borderColor: Colors.primary + '50',
+            borderColor: Colors.primary + '80',
           },
         ]}
         pointerEvents="none">
@@ -227,7 +227,7 @@ function TabButton({
       activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={options.title ?? route.name}>
-      <View style={{ opacity: 0.45 }}>
+      <View style={{ opacity: 0.35 }}>
         {options.tabBarIcon?.({
           color: Colors.textSecondary,
           size: 22,
