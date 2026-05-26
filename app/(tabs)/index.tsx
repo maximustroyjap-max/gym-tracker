@@ -1,12 +1,5 @@
-/**
- * HOME SCREEN — Premium Redesign
- *
- * Clean, professional dashboard with the rank icon as the visual centerpiece.
- * Hero card with tinted glow, spring-animated progress, and premium pill breakdown.
- */
-
 import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Animated, ScrollView, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/context/ThemeContext';
@@ -15,7 +8,8 @@ import { router } from 'expo-router';
 import { getTierColor, getTierProgress, getNextTier } from '@/constants/ranks';
 import { RankIcon } from '@/components/RankIcon';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { GlassCard } from '@/components/GlassCard';
+import { NeonCard } from '@/components/NeonCard';
+import { AppText } from '@/components/ui/AppText';
 import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 import { TAB_BAR_TOTAL_HEIGHT } from '@/components/CurvedTabBar';
 
@@ -30,7 +24,6 @@ export default function HomeScreen() {
   const nextTier = getNextTier(currentRank);
   const progressPercent = Math.max(tierProgress * 100, 3);
 
-  // Animated progress bar
   const progressAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -53,15 +46,16 @@ export default function HomeScreen() {
         style={styles.scrollView}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl, flexGrow: 1 }]}
         showsVerticalScrollIndicator={false}>
-        {/* ── Minimal Header ── */}
+
+        {/* Header */}
         <View style={styles.headerRow}>
           <View>
-            <Text style={[styles.greetingLabel, { color: Colors.textSecondary }]}>
+            <AppText weight="medium" style={[styles.greetingLabel, { color: Colors.textSecondary }]}>
               Welcome back
-            </Text>
-            <Text style={[styles.greetingName, { color: Colors.text }]}>
+            </AppText>
+            <AppText weight="bold" style={[styles.greetingName, { color: Colors.text }]}>
               {user.username}
-            </Text>
+            </AppText>
           </View>
           <TouchableOpacity
             style={[styles.settingsPill, { backgroundColor: Colors.card, borderColor: Colors.border }]}
@@ -71,180 +65,120 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* ── Background Gradient Orbs (for glassmorphism depth) ── */}
-        <View style={styles.gradientOrbs} pointerEvents="none">
-          <LinearGradient
-            colors={[rankColor + '18', 'transparent']}
-            style={[styles.orb, styles.orbTop]}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-          />
-          <LinearGradient
-            colors={[Colors.primary + '10', 'transparent']}
-            style={[styles.orb, styles.orbBottom]}
-            start={{ x: 0.5, y: 1 }}
-            end={{ x: 0.5, y: 0 }}
-          />
-        </View>
-
-        {/* ── Hero Rank Card (Glassmorphism) ── */}
-        <GlassCard
-          intensity={60}
-          borderColor={rankColor + '30'}
+        {/* Hero Rank Card */}
+        <NeonCard
+          glowColor={rankColor}
           borderRadius={radius['2xl']}
           onPress={() => router.push('/rank-details')}
           activeOpacity={activeOpacity.card}
           style={styles.heroCard}
           contentStyle={styles.heroCardContent}>
-          {/* Soft glow orb behind the icon */}
-          <View style={[styles.glowOrb, { backgroundColor: rankColor + '10' }]} />
 
-          <View style={styles.heroContent}>
-            {/* Icon Ring */}
-            <View
-              style={[
-                styles.iconRing,
-                {
-                  backgroundColor: rankColor + '12',
-                  borderColor: rankColor + '25',
-                },
-              ]}>
+          <View style={[styles.orbTopRight, { backgroundColor: rankColor + '25' }]} pointerEvents="none" />
+          <View style={[styles.orbBottomLeft, { backgroundColor: Colors.primary + '15' }]} pointerEvents="none" />
+
+          <View style={styles.heroBody}>
+            <View style={styles.heroLeft}>
+              <AppText weight="medium" style={[styles.rankLabel, { color: Colors.textSecondary }]}>
+                Current Rank
+              </AppText>
+              <AppText weight="bold" style={[styles.rankName, { color: Colors.text }]}>
+                {user.rank.split(' ')[0]}{' '}
+                <AppText weight="bold" style={{ color: rankColor }}>
+                  {user.rank.split(' ')[1] ?? ''}
+                </AppText>
+              </AppText>
+            </View>
+
+            <View style={[styles.iconRing, { backgroundColor: rankColor + '14', borderColor: rankColor + '58' }]}>
               <RankIcon
                 rank={user.rank}
-                size={56}
+                size={32}
                 glow
                 glowColor={rankColor}
                 glowIntensity="strong"
                 animated
               />
             </View>
-
-            {/* Rank Name */}
-            <Text style={[styles.rankName, { color: rankColor }]}>{user.rank}</Text>
-
-            {/* Fitness Score */}
-            <View style={styles.scoreRow}>
-              <Text style={[styles.scoreNumber, { color: Colors.text }]}>
-                {user.fitnessScore}
-              </Text>
-              <Text style={[styles.scoreTotal, { color: Colors.textSecondary }]}>
-                / 100
-              </Text>
-            </View>
-
-            {/* Progress Bar */}
-            <View style={[styles.progressTrack, { backgroundColor: Colors.border + '80' }]}>
-              <Animated.View
-                style={[
-                  styles.progressFill,
-                  { width: progressWidth, backgroundColor: rankColor },
-                ]}
-              />
-              <Animated.View
-                style={[styles.progressGloss, { width: progressWidth }]}>
-                <LinearGradient
-                  colors={['rgba(255,255,255,0.3)', 'transparent']}
-                  style={StyleSheet.absoluteFill}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0, y: 1 }}
-                />
-              </Animated.View>
-            </View>
-
-            {/* Next tier text */}
-            <Text style={[styles.nextTierText, { color: Colors.textSecondary }]}>
-              {Math.round(tierProgress * 100)}% to {nextTier ?? 'Max Rank'}
-            </Text>
           </View>
-        </GlassCard>
 
-        {/* ── Fitness Breakdown Card (Glassmorphism) ── */}
-        <GlassCard
-          intensity={40}
-          borderRadius={radius.xl}
-          style={styles.breakdownCard}
-          contentStyle={styles.breakdownCardContent}>
-          <Text style={[styles.breakdownTitle, { color: Colors.text }]}>
+          <View style={styles.scoreRow}>
+            <AppText weight="medium" style={[styles.scoreLabel, { color: Colors.textSecondary }]}>
+              Fitness Score
+            </AppText>
+            <AppText weight="bold" style={[styles.scoreNumber, { color: Colors.text }]}>
+              {user.fitnessScore}
+              <AppText weight="regular" style={[styles.scoreTotal, { color: Colors.border }]}> / 100</AppText>
+            </AppText>
+          </View>
+
+          <View style={[styles.progressTrack, { backgroundColor: Colors.border }]}>
+            <Animated.View style={[styles.progressFill, { width: progressWidth }]}>
+              <LinearGradient
+                colors={[Colors.primary, Colors.secondary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <View style={styles.progressGloss} />
+            </Animated.View>
+          </View>
+
+          <AppText weight="medium" style={[styles.nextTierText, { color: Colors.textSecondary }]}>
+            {Math.round(tierProgress * 100)}% to {nextTier ?? 'Max Rank'}
+          </AppText>
+        </NeonCard>
+
+        {/* Score Breakdown */}
+        <NeonCard borderRadius={radius.xl} style={styles.breakdownCard} contentStyle={styles.breakdownCardContent}>
+          <AppText weight="semibold" style={[styles.sectionLabel, { color: Colors.textSecondary }]}>
             Score Breakdown
-          </Text>
-          <BreakdownBar
-            label="Consistency"
-            value={user.fitnessBreakdown.consistency}
-            color={Colors.primary}
-            Colors={Colors}
-          />
-          <BreakdownBar
-            label="Volume"
-            value={user.fitnessBreakdown.volume}
-            color={Colors.secondary}
-            Colors={Colors}
-          />
-          <BreakdownBar
-            label="Progression"
-            value={user.fitnessBreakdown.progression}
-            color={Colors.gold}
-            Colors={Colors}
-          />
-          <BreakdownBar
-            label="Variety"
-            value={user.fitnessBreakdown.variety}
-            color={Colors.bronze}
-            Colors={Colors}
-          />
-        </GlassCard>
+          </AppText>
+          <BreakdownBar label="Consistency" value={user.fitnessBreakdown.consistency} color={Colors.primary} Colors={Colors} />
+          <BreakdownBar label="Volume" value={user.fitnessBreakdown.volume} color={Colors.secondary} Colors={Colors} />
+          <BreakdownBar label="Progression" value={user.fitnessBreakdown.progression} color={Colors.primary} Colors={Colors} />
+          <BreakdownBar label="Variety" value={user.fitnessBreakdown.variety} color={Colors.secondary} Colors={Colors} />
+        </NeonCard>
 
-        {/* ── Quick Stats Row ── */}
+        {/* Quick Stats */}
         <View style={styles.statsRow}>
-          <StatItem
-            icon="dumbbell.fill"
-            label="Workouts"
-            value={user.totalWorkouts.toString()}
-            Colors={Colors}
-          />
-          <StatItem
-            icon="flame.fill"
-            label="Streak"
-            value={`${user.currentStreak}w`}
-            Colors={Colors}
-          />
-          <StatItem
-            icon="clock.fill"
-            label="Hours"
-            value={user.totalHours.toString()}
-            Colors={Colors}
-          />
+          <StatItem label="Workouts" value={user.totalWorkouts.toString()} Colors={Colors} />
+          <StatItem label="Streak" value={`${user.currentStreak}wk`} Colors={Colors} />
+          <StatItem label="Hours" value={user.totalHours.toString()} Colors={Colors} />
         </View>
 
-        {/* ── Quick Actions ── */}
+        {/* Quick Actions */}
         <View style={styles.actionsColumn}>
           <TouchableOpacity
-            style={[styles.primaryButton, { backgroundColor: Colors.primary }]}
             onPress={() => router.push('/(tabs)/workout')}
-            activeOpacity={activeOpacity.button}>
-            <IconSymbol name="dumbbell.fill" size={18} color={Colors.background} />
-            <Text style={[styles.primaryButtonText, { color: Colors.background }]}>
-              Start Workout
-            </Text>
+            activeOpacity={activeOpacity.button}
+            style={styles.primaryButtonWrapper}>
+            <LinearGradient
+              colors={[Colors.primary, Colors.secondary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.primaryButton}>
+              <AppText weight="bold" style={[styles.primaryButtonText, { color: '#08080f' }]}>
+                Start Workout
+              </AppText>
+            </LinearGradient>
           </TouchableOpacity>
 
-          <GlassCard
-            intensity={25}
-            borderRadius={radius.lg}
+          <TouchableOpacity
+            style={[styles.secondaryButton, { borderColor: Colors.border }]}
             onPress={() => router.push('/(tabs)/profile')}
-            activeOpacity={activeOpacity.button}
-            style={styles.secondaryButton}
-            contentStyle={styles.secondaryButtonContent}>
-            <Text style={[styles.secondaryButtonText, { color: Colors.text }]}>
+            activeOpacity={activeOpacity.button}>
+            <AppText weight="semibold" style={[styles.secondaryButtonText, { color: Colors.textSecondary }]}>
               View Profile
-            </Text>
-          </GlassCard>
+            </AppText>
+          </TouchableOpacity>
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-/** Mini horizontal breakdown bar */
 function BreakdownBar({
   label,
   value,
@@ -260,288 +194,85 @@ function BreakdownBar({
   return (
     <View style={styles.breakdownRow}>
       <View style={styles.breakdownLabelRow}>
-        <Text style={[styles.breakdownLabel, { color: Colors.text }]}>{label}</Text>
-        <Text style={[styles.breakdownValue, { color }]}>{Math.round(value)}</Text>
+        <AppText weight="medium" style={[styles.breakdownLabel, { color: Colors.text }]}>{label}</AppText>
+        <AppText weight="semibold" style={[styles.breakdownValue, { color }]}>{Math.round(value)}%</AppText>
       </View>
       <View style={[styles.breakdownTrack, { backgroundColor: Colors.border }]}>
         <View style={[styles.breakdownFill, { width: `${pct}%`, backgroundColor: color }]} />
-        <View style={[styles.breakdownGloss, { width: `${pct}%`, backgroundColor: Colors.gloss }]} />
+        <View style={styles.breakdownGloss} />
       </View>
     </View>
   );
 }
 
-/** Quick stat item with icon */
 function StatItem({
-  icon,
   label,
   value,
   Colors,
 }: {
-  icon: string;
   label: string;
   value: string;
   Colors: ReturnType<typeof useTheme>;
 }) {
   return (
-    <GlassCard intensity={30} borderRadius={radius.xl} style={styles.statItem} contentStyle={styles.statItemContent}>
-      <View style={[styles.statIconBox, { backgroundColor: Colors.primary + '18' }]}>
-        <IconSymbol name={icon} size={16} color={Colors.primary} />
-      </View>
-      <Text style={[styles.statValue, { color: Colors.text }]}>{value}</Text>
-      <Text style={[styles.statLabel, { color: Colors.textSecondary }]}>{label}</Text>
-    </GlassCard>
+    <NeonCard borderRadius={radius.xl} style={styles.statItem} contentStyle={styles.statItemContent}>
+      <AppText weight="bold" style={[styles.statValue, { color: Colors.text }]}>{value}</AppText>
+      <AppText weight="semibold" style={[styles.statLabel, { color: Colors.textSecondary }]}>{label}</AppText>
+    </NeonCard>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: spacing.xl,
-    gap: spacing.lg,
-  },
+  safeArea: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { padding: spacing.xl, gap: spacing.lg },
 
-  /* ── Header ── */
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  greetingLabel: {
-    fontSize: typography.sm,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  greetingName: {
-    fontSize: typography['2xl'],
-    fontWeight: 'bold',
-  },
-  settingsPill: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xs },
+  greetingLabel: { fontSize: typography.xs, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 2 },
+  greetingName: { fontSize: typography['2xl'] },
+  settingsPill: { width: 40, height: 40, borderRadius: radius.full, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
 
-  /* ── Background Gradient Orbs ── */
-  gradientOrbs: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 0,
-  },
-  orb: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-  },
-  orbTop: {
-    top: 80,
-    alignSelf: 'center',
-  },
-  orbBottom: {
-    bottom: 100,
-    alignSelf: 'center',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-  },
+  heroCard: { overflow: 'hidden', position: 'relative' },
+  heroCardContent: { padding: spacing['2xl'], gap: spacing.md },
+  orbTopRight: { position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: 70 },
+  orbBottomLeft: { position: 'absolute', bottom: -30, left: -20, width: 100, height: 100, borderRadius: 50 },
+  heroBody: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  heroLeft: { flex: 1 },
+  rankLabel: { fontSize: typography.xs, letterSpacing: 3, textTransform: 'uppercase', marginBottom: spacing.xs },
+  rankName: { fontSize: typography['3xl'] },
+  iconRing: { width: 56, height: 56, borderRadius: radius.lg, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
 
-  /* ── Hero Rank Card ── */
-  heroCard: {
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  heroCardContent: {
-    padding: spacing['2xl'],
-    alignItems: 'center',
-  },
-  glowOrb: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    top: -50,
-    alignSelf: 'center',
-  },
-  heroContent: {
-    alignItems: 'center',
-    zIndex: 1,
-    width: '100%',
-  },
-  iconRing: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    borderWidth: 1.5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  rankName: {
-    fontSize: typography['2xl'],
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: spacing.sm,
-  },
-  scoreRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: spacing.md,
-  },
-  scoreNumber: {
-    fontSize: typography['4xl'],
-    fontWeight: 'bold',
-  },
-  scoreTotal: {
-    fontSize: typography.xl,
-    marginLeft: spacing.xs,
-  },
-  progressTrack: {
-    width: '100%',
-    height: 10,
-    borderRadius: 5,
-    overflow: 'hidden',
-    marginBottom: spacing.sm,
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 5,
-  },
-  progressGloss: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: '50%',
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-  },
-  nextTierText: {
-    fontSize: typography.sm,
-    fontWeight: '500',
-  },
+  scoreRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  scoreLabel: { fontSize: typography.xs, letterSpacing: 2, textTransform: 'uppercase' },
+  scoreNumber: { fontSize: typography['2xl'] },
+  scoreTotal: { fontSize: typography.sm },
 
-  /* ── Breakdown Card ── */
-  breakdownCard: {
-    overflow: 'hidden',
-  },
-  breakdownCardContent: {
-    padding: spacing.xl,
-    gap: spacing.md,
-  },
-  breakdownTitle: {
-    fontSize: typography.sm,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-  },
-  breakdownRow: {
-    gap: spacing.xs,
-  },
-  breakdownLabelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  breakdownLabel: {
-    fontSize: typography.sm,
-    fontWeight: '600',
-  },
-  breakdownValue: {
-    fontSize: typography.sm,
-    fontWeight: 'bold',
-  },
-  breakdownTrack: {
-    height: 6,
-    borderRadius: 3,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  breakdownFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  breakdownGloss: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: '50%',
-    borderTopLeftRadius: 3,
-    borderTopRightRadius: 3,
-  },
+  progressTrack: { height: 8, borderRadius: 4, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 4, overflow: 'hidden', position: 'relative' },
+  progressGloss: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%', backgroundColor: 'rgba(255,255,255,0.15)', borderTopLeftRadius: 4, borderTopRightRadius: 4 },
+  nextTierText: { fontSize: typography.xs, letterSpacing: 1 },
 
-  /* ── Quick Stats ── */
-  statsRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    justifyContent: 'space-between',
-  },
-  statItem: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  statItemContent: {
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.sm,
-    gap: spacing.xs,
-  },
-  statIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  statValue: {
-    fontSize: typography.lg,
-    fontWeight: 'bold',
-  },
-  statLabel: {
-    fontSize: typography.xs,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+  breakdownCard: {},
+  breakdownCardContent: { padding: spacing.xl, gap: spacing.md },
+  sectionLabel: { fontSize: typography.xs, letterSpacing: 3, textTransform: 'uppercase', marginBottom: spacing.xs },
+  breakdownRow: { gap: spacing.xs },
+  breakdownLabelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  breakdownLabel: { fontSize: typography.sm },
+  breakdownValue: { fontSize: typography.sm },
+  breakdownTrack: { height: 4, borderRadius: 2, overflow: 'hidden', position: 'relative' },
+  breakdownFill: { height: '100%', borderRadius: 2 },
+  breakdownGloss: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%', backgroundColor: 'rgba(255,255,255,0.15)' },
 
-  /* ── Actions ── */
-  actionsColumn: {
-    gap: spacing.md,
-    marginTop: 'auto',
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    paddingVertical: spacing.lg,
-    borderRadius: radius.lg,
-    minHeight: 56,
-  },
-  primaryButtonText: {
-    fontSize: typography.lg,
-    fontWeight: 'bold',
-  },
-  secondaryButton: {
-    overflow: 'hidden',
-  },
-  secondaryButtonContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.lg,
-    minHeight: 56,
-  },
-  secondaryButtonText: {
-    fontSize: typography.lg,
-    fontWeight: 'bold',
-  },
+  statsRow: { flexDirection: 'row', gap: spacing.md },
+  statItem: { flex: 1 },
+  statItemContent: { alignItems: 'center', paddingVertical: spacing.lg, paddingHorizontal: spacing.sm, gap: spacing.xs },
+  statValue: { fontSize: typography.lg },
+  statLabel: { fontSize: typography.xs, textTransform: 'uppercase', letterSpacing: 2 },
+
+  actionsColumn: { gap: spacing.md, marginTop: 'auto' },
+  primaryButtonWrapper: { borderRadius: radius.lg, overflow: 'hidden' },
+  primaryButton: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.lg, minHeight: 52 },
+  primaryButtonText: { fontSize: typography.base, letterSpacing: 1, textTransform: 'uppercase' },
+  secondaryButton: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.lg, minHeight: 52, borderRadius: radius.lg, borderWidth: 1 },
+  secondaryButtonText: { fontSize: typography.base, letterSpacing: 1, textTransform: 'uppercase' },
 });
