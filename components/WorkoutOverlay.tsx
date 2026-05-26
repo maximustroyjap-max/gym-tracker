@@ -14,6 +14,8 @@ import {
   Animated,
   Dimensions,
   Platform,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Fonts } from '@/constants/theme';
@@ -172,6 +174,14 @@ export function WorkoutOverlay() {
   const restTimerSecondsRef = useRef(0);
   restTimerSecondsRef.current = restTimerSeconds;
 
+  // Timestamp refs for background-safe timers
+  const workoutStartTimeRef = useRef<number>(0);
+  const restEndTimeRef = useRef<number>(0);
+  const isActiveRef = useRef(false);
+  isActiveRef.current = isActive;
+  const restTimerActiveRef = useRef(false);
+  restTimerActiveRef.current = restTimerActive;
+
   const [showCompleteAnimation, setShowCompleteAnimation] = useState(false);
   const [workoutStats, setWorkoutStats] = useState({
     duration: 0,
@@ -245,8 +255,9 @@ export function WorkoutOverlay() {
 
   useEffect(() => {
     if (!isActive) return;
+    workoutStartTimeRef.current = Date.now();
     const interval = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
+      setElapsedSeconds(Math.floor((Date.now() - workoutStartTimeRef.current) / 1000));
     }, 1000);
     return () => clearInterval(interval);
   }, [isActive]);
@@ -254,13 +265,9 @@ export function WorkoutOverlay() {
   useEffect(() => {
     if (!restTimerActive) return;
     const interval = setInterval(() => {
-      const current = restTimerSecondsRef.current;
-      if (current <= 1) {
-        setRestTimerSeconds(0);
-        return;
-      }
-      setRestTimerSeconds(current - 1);
-    }, 1000);
+      const remaining = Math.max(0, Math.floor((restEndTimeRef.current - Date.now()) / 1000));
+      setRestTimerSeconds(remaining);
+    }, 500);
     return () => clearInterval(interval);
   }, [restTimerActive]);
 
@@ -273,6 +280,22 @@ export function WorkoutOverlay() {
     return () => clearTimeout(timeout);
   }, [restTimerActive, restTimerSeconds, user.restTimerSettings.soundEffect]);
 
+  // Correct both timers immediately when app returns from background
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState !== 'active') return;
+      if (isActiveRef.current && workoutStartTimeRef.current > 0) {
+        setElapsedSeconds(Math.floor((Date.now() - workoutStartTimeRef.current) / 1000));
+      }
+      if (restTimerActiveRef.current && restEndTimeRef.current > 0) {
+        const remaining = Math.max(0, Math.floor((restEndTimeRef.current - Date.now()) / 1000));
+        setRestTimerSeconds(remaining);
+      }
+    };
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove();
+  }, []);
+
   const animateTo = (targetY: number, callback?: () => void) => {
     Animated.spring(translateY, {
       toValue: targetY,
@@ -284,6 +307,7 @@ export function WorkoutOverlay() {
 
   const restTimerDuration = user.restTimerSettings.durationSeconds;
   const startRestTimer = useCallback(() => {
+    restEndTimeRef.current = Date.now() + restTimerDuration * 1000;
     setRestTimerActive(true);
     setRestTimerSeconds(restTimerDuration);
   }, [restTimerDuration]);
