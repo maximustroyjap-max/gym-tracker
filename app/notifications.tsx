@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -28,7 +29,17 @@ export default function NotificationsScreen() {
   const { user, updateUser } = useUser();
   const settings = user.notificationSettings;
 
-  const toggleAlert = (value: boolean) => {
+  const toggleAlert = async (value: boolean) => {
+    if (value && Platform.OS !== 'web') {
+      const result = await Notifications.requestPermissionsAsync();
+      if (!result.granted) {
+        Alert.alert(
+          'Permission Required',
+          'Please enable notifications in your device settings to receive workout alerts.',
+        );
+        return;
+      }
+    }
     updateUser({
       notificationSettings: {
         ...settings,

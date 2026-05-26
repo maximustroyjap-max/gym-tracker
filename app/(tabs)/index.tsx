@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/context/ThemeContext';
 import { useUser } from '@/context/UserContext';
 import { router } from 'expo-router';
-import { getTierColor, getTierProgress, getNextTier } from '@/constants/ranks';
+import { getTierColor, getTierProgress, getNextTier, getDaysUntilStreakDies } from '@/constants/ranks';
 import { RankIcon } from '@/components/RankIcon';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { NeonCard } from '@/components/NeonCard';
@@ -17,6 +17,9 @@ export default function HomeScreen() {
   const Colors = useTheme();
   const { user } = useUser();
   const insets = useSafeAreaInsets();
+
+  const daysUntilStreakDies = getDaysUntilStreakDies(user.lastWorkoutDate, user.weeklyTarget);
+  const showStreakWarning = user.currentStreak > 0 && daysUntilStreakDies <= 1;
 
   const currentRank = user.rank as import('@/constants/ranks').SubTier;
   const rankColor = getTierColor(currentRank, user.theme);
@@ -143,7 +146,12 @@ export default function HomeScreen() {
         {/* Quick Stats */}
         <View style={styles.statsRow}>
           <StatItem label="Workouts" value={user.totalWorkouts.toString()} Colors={Colors} />
-          <StatItem label="Streak" value={`${user.currentStreak}wk`} Colors={Colors} />
+          <StatItem
+            label="Streak"
+            value={`${user.currentStreak}d`}
+            warning={showStreakWarning ? (daysUntilStreakDies === 0 ? 'Gone!' : 'Last day!') : undefined}
+            Colors={Colors}
+          />
           <StatItem label="Hours" value={user.totalHours.toString()} Colors={Colors} />
         </View>
 
@@ -208,16 +216,21 @@ function BreakdownBar({
 function StatItem({
   label,
   value,
+  warning,
   Colors,
 }: {
   label: string;
   value: string;
+  warning?: string;
   Colors: ReturnType<typeof useTheme>;
 }) {
   return (
     <NeonCard borderRadius={radius.xl} style={styles.statItem} contentStyle={styles.statItemContent}>
       <AppText weight="bold" style={[styles.statValue, { color: Colors.text }]}>{value}</AppText>
       <AppText weight="semibold" style={[styles.statLabel, { color: Colors.textSecondary }]}>{label}</AppText>
+      {warning && (
+        <AppText weight="bold" style={[styles.statWarning, { color: Colors.danger }]}>{warning}</AppText>
+      )}
     </NeonCard>
   );
 }
@@ -268,6 +281,7 @@ const styles = StyleSheet.create({
   statItemContent: { alignItems: 'center', paddingVertical: spacing.lg, paddingHorizontal: spacing.sm, gap: spacing.xs },
   statValue: { fontSize: typography.lg },
   statLabel: { fontSize: typography.xs, textTransform: 'uppercase', letterSpacing: 2 },
+  statWarning: { fontSize: typography.xs, letterSpacing: 1, marginTop: 2 },
 
   actionsColumn: { gap: spacing.md, marginTop: 'auto' },
   primaryButtonWrapper: { borderRadius: radius.lg, overflow: 'hidden' },

@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { View, Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import {
   SpaceGrotesk_400Regular,
   SpaceGrotesk_500Medium,
@@ -26,6 +27,17 @@ import AuthScreen from './auth';
 import { WorkoutOverlay } from '@/components/WorkoutOverlay';
 import { AmbientBackground } from '@/components/AmbientBackground';
 import { AnimatedSplashScreen } from '@/components/AnimatedSplashScreen';
+
+// Show notifications even while the app is in the foreground.
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 // Prevent native splash from auto-hiding early.
 // Wrapped in catch — if called before native modules are ready, we still have

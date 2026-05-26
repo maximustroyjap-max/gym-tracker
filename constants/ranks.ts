@@ -159,57 +159,75 @@ export function migrateOldRank(oldRank: string): SubTier {
   return mapping[oldRank] || 'Bronze 1';
 }
 
+function parseDateString(dateStr: string): Date {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function todayMidnight(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function daysBetween(a: Date, b: Date): number {
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+
 /**
- * Calculate the current weekly streak.
- *
- * A "successful streak week" = the user completed at least `weeklyTarget` workouts.
- * Streak = consecutive successful weeks going backwards from the current week.
- * If the current week hasn't met the target yet, it's NOT counted (ongoing weeks
- * don't break the streak — they just don't extend it yet).
- *
- * @param weeklyHistory  Array of { weekStart, count } entries
- * @param weeklyTarget   Target workouts per week
- * @returns              Number of consecutive successful weeks
+ * Grace days before a streak dies = 7 - weeklyTarget (minimum 0).
+ * e.g. target 4x/week → 3 grace days → streak survives a 4-day gap.
  */
-export function calculateWeeklyStreak(
-  weeklyHistory: WeeklyWorkout[],
+export function getStreakGraceDays(weeklyTarget: number): number {
+  return Math.max(0, 7 - weeklyTarget);
+}
+
+/**
+ * Compute the new streak count after finishing a workout.
+ * - Same day as last workout → no change (already counted today).
+ * - Within grace window → increment by 1.
+ * - Gap exceeded → reset to 1 (this workout starts a new run).
+ */
+export function calculateNewStreak(
+  currentStreak: number,
+  lastWorkoutDate: string,
   weeklyTarget: number
 ): number {
-  if (weeklyTarget <= 0) return 0;
+  if (!lastWorkoutDate) return 1;
+  const graceDays = getStreakGraceDays(weeklyTarget);
+  const diff = daysBetween(parseDateString(lastWorkoutDate), todayMidnight());
+  if (diff === 0) return currentStreak;
+  if (diff <= graceDays + 1) return currentStreak + 1;
+  return 1;
+}
 
-  const historyMap = new Map(weeklyHistory.map((w) => [w.weekStart, w.count]));
+/**
+ * Called on app launch — returns 0 if the streak has expired since the last workout.
+ */
+export function checkStreakExpiry(
+  currentStreak: number,
+  lastWorkoutDate: string,
+  weeklyTarget: number
+): number {
+  if (!lastWorkoutDate || currentStreak === 0) return 0;
+  const graceDays = getStreakGraceDays(weeklyTarget);
+  const diff = daysBetween(parseDateString(lastWorkoutDate), todayMidnight());
+  return diff > graceDays + 1 ? 0 : currentStreak;
+}
 
-  // Current week's Monday
-  const today = new Date();
-  const day = today.getDay();
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-  const currentMonday = new Date(today);
-  currentMonday.setDate(diff);
-
-  let streak = 0;
-
-  // Check current week — only counts if target is already met
-  const currentWeekKey = currentMonday.toISOString().split('T')[0];
-  const currentCount = historyMap.get(currentWeekKey) || 0;
-  if (currentCount >= weeklyTarget) {
-    streak++;
-  }
-
-  // Check past weeks going backwards
-  for (let i = 1; i < 52; i++) {
-    const pastMonday = new Date(currentMonday);
-    pastMonday.setDate(pastMonday.getDate() - i * 7);
-    const weekKey = pastMonday.toISOString().split('T')[0];
-    const count = historyMap.get(weekKey) || 0;
-
-    if (count >= weeklyTarget) {
-      streak++;
-    } else {
-      break; // Streak broken
-    }
-  }
-
-  return streak;
+/**
+ * How many days are left before the streak dies (0 = already dead or no workouts).
+ * Use this to show a warning badge on the home / profile screens.
+ */
+export function getDaysUntilStreakDies(
+  lastWorkoutDate: string,
+  weeklyTarget: number
+): number {
+  if (!lastWorkoutDate) return 0;
+  const graceDays = getStreakGraceDays(weeklyTarget);
+  const diff = daysBetween(parseDateString(lastWorkoutDate), todayMidnight());
+  return Math.max(0, graceDays + 1 - diff);
 }
 
 // ───────────────────────────────────────────────
@@ -268,7 +286,8 @@ function buildFourWeekHistory(weeklyHistory: WeeklyWorkout[]): WeeklyWorkout[] {
 function calculateConsistency(user: User): number {
   const { currentStreak, weeklyTarget, weeklyHistory } = user;
 
-  const streakPoints = Math.min(currentStreak, 10) * 5;
+  // Scale daily streak into the same 0-50 point range as before (cap at 70 days ≈ 10 weeks)
+  const streakPoints = Math.min(currentStreak / 70, 1) * 50;
 
   const fourWeeks = buildFourWeekHistory(weeklyHistory);
   let weeklyPoints = 0;

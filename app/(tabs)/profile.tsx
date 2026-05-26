@@ -31,7 +31,7 @@ import { NeonCard } from '@/components/NeonCard';
 import { AppText } from '@/components/ui/AppText';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
-import { getTierColor, getTierProgress, getNextTier } from '@/constants/ranks';
+import { getTierColor, getTierProgress, getNextTier, getDaysUntilStreakDies } from '@/constants/ranks';
 import { RankIcon } from '@/components/RankIcon';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 
@@ -50,6 +50,10 @@ export default function ProfileScreen() {
   const rankProgressAnim = useRef(new Animated.Value(0)).current;
 
   const xpProgress = Math.min(user.xp / user.xpToNextLevel, 1);
+  const daysUntilStreakDies = getDaysUntilStreakDies(user.lastWorkoutDate, user.weeklyTarget);
+  const streakWarning = user.currentStreak > 0 && daysUntilStreakDies <= 1
+    ? (daysUntilStreakDies === 0 ? 'Streak gone!' : 'Work out today!')
+    : undefined;
   const rankColor = getTierColor(user.rank, user.theme);
   const tierProgress = getTierProgress(
     user.fitnessScore,
@@ -209,37 +213,48 @@ export default function ProfileScreen() {
           </NeonCard>
         ) : null}
 
-        {/* Stats Grid - 2x2 layout */}
+        {/* Stats Grid - 2 explicit rows for consistent heights */}
         <View style={styles.statsGrid}>
-          <StatCard
-            label="Level"
-            value={user.level.toString()}
-            subtext={`${user.xp} / ${user.xpToNextLevel} XP`}
-            showProgress
-            progress={xpProgress}
-            color={Colors.primary}
-            Colors={Colors}
-            highlight
-          />
-          <StatCard
-            label="Workouts"
-            value={user.totalWorkouts.toString()}
-            subtext="completed"
-            Colors={Colors}
-          />
-          <StatCard
-            label="Streak"
-            value={user.currentStreak.toString()}
-            subtext="weeks"
-            highlight
-            Colors={Colors}
-          />
-          <StatCard
-            label="Hours"
-            value={user.totalHours.toString()}
-            subtext="total"
-            Colors={Colors}
-          />
+          <View style={styles.statsRow}>
+            <StatCard
+              label="Level"
+              value={user.level.toString()}
+              subtext={`${user.xp} / ${user.xpToNextLevel} XP`}
+              showProgress
+              progress={xpProgress}
+              color={Colors.primary}
+              Colors={Colors}
+              highlight
+            />
+            <StatCard
+              label="Workouts"
+              value={user.totalWorkouts.toString()}
+              subtext="completed"
+              Colors={Colors}
+            />
+          </View>
+          <View style={styles.statsRow}>
+            <StatCard
+              label="Streak"
+              value={user.currentStreak.toString()}
+              subtext="day streak"
+              note={
+                streakWarning
+                  ? { text: streakWarning, danger: true }
+                  : user.bestStreak > user.currentStreak
+                  ? { text: `Best: ${user.bestStreak}d`, danger: false }
+                  : undefined
+              }
+              highlight
+              Colors={Colors}
+            />
+            <StatCard
+              label="Hours"
+              value={user.totalHours.toString()}
+              subtext="total"
+              Colors={Colors}
+            />
+          </View>
         </View>
 
         {/* Dashboard Section */}
@@ -378,6 +393,7 @@ function StatCard({
   label,
   value,
   subtext,
+  note,
   showProgress,
   progress,
   color,
@@ -387,6 +403,7 @@ function StatCard({
   label: string;
   value: string;
   subtext: string;
+  note?: { text: string; danger: boolean };
   showProgress?: boolean;
   progress?: number;
   color?: string;
@@ -404,26 +421,16 @@ function StatCard({
       </AppText>
       <AppText
         weight="bold"
-        style={[
-          styles.statValue,
-          { color: highlight ? Colors.primary : Colors.text },
-        ]}>
+        style={[styles.statValue, { color: highlight ? Colors.primary : Colors.text }]}>
         {value}
       </AppText>
       {showProgress && progress !== undefined && (
         <View style={styles.miniProgressContainer}>
-          <View
-            style={[
-              styles.miniProgressBackground,
-              { backgroundColor: Colors.border + '80' },
-            ]}>
+          <View style={[styles.miniProgressBackground, { backgroundColor: Colors.border + '80' }]}>
             <View
               style={[
                 styles.miniProgressFill,
-                {
-                  width: `${progress * 100}%`,
-                  backgroundColor: color || Colors.primary,
-                },
+                { width: `${progress * 100}%`, backgroundColor: color || Colors.primary },
               ]}
             />
           </View>
@@ -432,6 +439,11 @@ function StatCard({
       <AppText style={[styles.statSubtext, { color: Colors.textSecondary }]}>
         {subtext}
       </AppText>
+      {note && (
+        <AppText weight="semibold" style={[styles.statNote, { color: note.danger ? Colors.danger : Colors.textSecondary }]}>
+          {note.text}
+        </AppText>
+      )}
     </NeonCard>
   );
 }
@@ -540,37 +552,41 @@ const styles = StyleSheet.create({
     borderRadius: 120,
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: spacing.md,
     marginTop: spacing.sm,
   },
+  statsRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
   statCard: {
     flex: 1,
-    minWidth: '45%',
     overflow: 'hidden',
   },
   statCardContent: {
     padding: spacing.lg,
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: 4,
+    minHeight: 110,
+    justifyContent: 'center',
   },
   statLabel: {
     fontSize: typography.xs,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: spacing.xs,
   },
   statValue: {
     fontSize: typography['2xl'],
   },
   miniProgressContainer: {
-    marginVertical: spacing.sm,
+    alignSelf: 'stretch',
+    marginVertical: spacing.xs,
   },
   miniProgressBackground: {
     height: 4,
     borderRadius: 2,
     overflow: 'hidden',
+    width: '100%',
   },
   miniProgressFill: {
     height: '100%',
@@ -578,6 +594,10 @@ const styles = StyleSheet.create({
   },
   statSubtext: {
     fontSize: typography.xs,
+  },
+  statNote: {
+    fontSize: typography.xs,
+    letterSpacing: 0.5,
   },
   dashboardHeader: {
     flexDirection: 'row',

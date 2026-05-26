@@ -30,9 +30,11 @@ import { RestTimer } from '@/components/RestTimer';
 import { WorkoutCompleteAnimation } from '@/components/WorkoutCompleteAnimation';
 import { EXERCISES, Exercise } from '@/constants/exercises';
 import { WorkoutHistoryEntry, HistoryExercise } from '@/types/user';
-import { calculateFitnessScore, getTierForScore, FitnessBreakdown, calculateWeeklyStreak } from '@/constants/ranks';
+import { calculateFitnessScore, getTierForScore, FitnessBreakdown, calculateNewStreak } from '@/constants/ranks';
 import { playAlertSound } from '@/utils/sound';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import * as Notifications from 'expo-notifications';
 
 const SCREEN_HEIGHT = Dimensions.get('screen').height;
 const MINIMIZED_HEIGHT = 110;
@@ -182,6 +184,11 @@ export function WorkoutOverlay() {
   const restTimerActiveRef = useRef(false);
   restTimerActiveRef.current = restTimerActive;
 
+  // Notification / keep-awake refs
+  const pendingNotifIdRef = useRef<string | null>(null);
+  const notifSettingsRef = useRef(user.notificationSettings);
+  notifSettingsRef.current = user.notificationSettings;
+
   const [showCompleteAnimation, setShowCompleteAnimation] = useState(false);
   const [workoutStats, setWorkoutStats] = useState({
     duration: 0,
@@ -280,18 +287,61 @@ export function WorkoutOverlay() {
     return () => clearTimeout(timeout);
   }, [restTimerActive, restTimerSeconds, user.restTimerSettings.soundEffect]);
 
-  // Correct both timers immediately when app returns from background
+  // Keep screen awake during active workouts when the user has enabled that setting
   useEffect(() => {
-    const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (nextAppState !== 'active') return;
-      if (isActiveRef.current && workoutStartTimeRef.current > 0) {
-        setElapsedSeconds(Math.floor((Date.now() - workoutStartTimeRef.current) / 1000));
-      }
-      if (restTimerActiveRef.current && restEndTimeRef.current > 0) {
-        const remaining = Math.max(0, Math.floor((restEndTimeRef.current - Date.now()) / 1000));
-        setRestTimerSeconds(remaining);
+    if (Platform.OS === 'web') return;
+    if (isActive && user.advancedSettings.disableSleep) {
+      activateKeepAwakeAsync();
+    } else {
+      deactivateKeepAwake();
+    }
+    return () => { deactivateKeepAwake(); };
+  }, [isActive, user.advancedSettings.disableSleep]);
+
+  // Correct timers on foreground resume; schedule / cancel unfinished-workout notification
+  useEffect(() => {
+    const cancelNotif = async () => {
+      if (pendingNotifIdRef.current && Platform.OS !== 'web') {
+        await Notifications.cancelScheduledNotificationAsync(pendingNotifIdRef.current).catch(() => {});
+        pendingNotifIdRef.current = null;
       }
     };
+
+    const scheduleNotif = async () => {
+      if (!isActiveRef.current || Platform.OS === 'web') return;
+      const ns = notifSettingsRef.current;
+      if (!ns.unfinishedWorkoutAlert) return;
+      await cancelNotif();
+      const id = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Workout still running! 💪',
+          body: 'You left a workout running. Tap to get back to it.',
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: ns.unfinishedWorkoutDelayMinutes * 60,
+        },
+      }).catch(() => null);
+      if (id) pendingNotifIdRef.current = id;
+    };
+
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        // Snap timers to correct values
+        if (isActiveRef.current && workoutStartTimeRef.current > 0) {
+          setElapsedSeconds(Math.floor((Date.now() - workoutStartTimeRef.current) / 1000));
+        }
+        if (restTimerActiveRef.current && restEndTimeRef.current > 0) {
+          const remaining = Math.max(0, Math.floor((restEndTimeRef.current - Date.now()) / 1000));
+          setRestTimerSeconds(remaining);
+        }
+        cancelNotif();
+      } else if (nextAppState === 'background') {
+        scheduleNotif();
+      }
+    };
+
     const subscription = AppState.addEventListener('change', handleAppStateChange);
     return () => subscription.remove();
   }, []);
@@ -368,6 +418,10 @@ export function WorkoutOverlay() {
   ).current;
 
   const handleCancel = () => {
+    if (Platform.OS !== 'web' && pendingNotifIdRef.current) {
+      Notifications.cancelScheduledNotificationAsync(pendingNotifIdRef.current).catch(() => {});
+      pendingNotifIdRef.current = null;
+    }
     setIsActive(false);
     setElapsedSeconds(0);
     setTrackedExercises([]);
@@ -488,7 +542,9 @@ export function WorkoutOverlay() {
       if (newHistory.length > 16) newHistory.shift();
     }
 
-    const newStreak = calculateWeeklyStreak(newHistory, user.weeklyTarget);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const newStreak = calculateNewStreak(user.currentStreak, user.lastWorkoutDate, user.weeklyTarget);
+    const newBestStreak = Math.max(user.bestStreak, newStreak);
     const hoursAdded = Math.round((elapsedSeconds / 3600) * 10) / 10;
     const newTotalHours = Math.round((user.totalHours + hoursAdded) * 10) / 10;
 
@@ -510,6 +566,8 @@ export function WorkoutOverlay() {
       xpToNextLevel: newXpToNextLevel,
       rankCredits: user.rankCredits + 10,
       currentStreak: newStreak,
+      bestStreak: newBestStreak,
+      lastWorkoutDate: todayStr,
       weeklyHistory: newHistory,
       workoutHistory: [historyEntry, ...user.workoutHistory],
       fitnessScore: newFitnessScore,
@@ -530,6 +588,10 @@ export function WorkoutOverlay() {
       oldRank: user.rank,
     });
 
+    if (Platform.OS !== 'web' && pendingNotifIdRef.current) {
+      Notifications.cancelScheduledNotificationAsync(pendingNotifIdRef.current).catch(() => {});
+      pendingNotifIdRef.current = null;
+    }
     setIsActive(false);
     setRestTimerActive(false);
     setShowCompleteAnimation(true);

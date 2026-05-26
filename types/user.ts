@@ -102,6 +102,8 @@ export interface User {
   rankCreditsToNext: number;
   totalWorkouts: number;
   currentStreak: number;
+  bestStreak: number;
+  lastWorkoutDate: string;
   totalHours: number;
   /** Target workouts per week — feeds into rank system & progress tracking */
   weeklyTarget: number;
@@ -173,6 +175,8 @@ export function createEmptyUser(): User {
     rankCreditsToNext: 500,
     totalWorkouts: 0,
     currentStreak: 0,
+    bestStreak: 0,
+    lastWorkoutDate: '',
     totalHours: 0,
     weeklyTarget: 5,
     monthlyVolumeGoal: 1000,
@@ -224,6 +228,8 @@ export const DEFAULT_USER: User = {
   rankCreditsToNext: 500,
   totalWorkouts: 0,
   currentStreak: 0,
+  bestStreak: 0,
+  lastWorkoutDate: '',
   totalHours: 0,
   weeklyTarget: 5,
   monthlyVolumeGoal: 1000,

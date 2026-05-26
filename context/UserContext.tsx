@@ -10,7 +10,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { User, DEFAULT_USER, createEmptyUser } from '@/types/user';
-import { calculateFitnessScore, getTierForScore, calculateWeeklyStreak } from '@/constants/ranks';
+import { calculateFitnessScore, getTierForScore, checkStreakExpiry } from '@/constants/ranks';
 
 interface UserContextType {
   user: User;
@@ -34,6 +34,8 @@ const FIELD_MAP: Record<string, string> = {
   rankCreditsToNext: 'rank_credits_to_next',
   totalWorkouts: 'total_workouts',
   currentStreak: 'current_streak',
+  bestStreak: 'best_streak',
+  lastWorkoutDate: 'last_workout_date',
   totalHours: 'total_hours',
   weeklyTarget: 'weekly_target',
   monthlyVolumeGoal: 'monthly_volume_goal',
@@ -66,6 +68,8 @@ function profileToUser(profile: any): User {
     rankCreditsToNext: profile.rank_credits_to_next ?? 500,
     totalWorkouts: profile.total_workouts ?? 0,
     currentStreak: profile.current_streak ?? 0,
+    bestStreak: profile.best_streak ?? 0,
+    lastWorkoutDate: profile.last_workout_date ?? '',
     totalHours: profile.total_hours ?? 0,
     weeklyTarget: profile.weekly_target ?? 5,
     monthlyVolumeGoal: profile.monthly_volume_goal ?? 1000,
@@ -146,9 +150,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
       let mergedUser = profileToUser(profile);
 
-      // Recalculate streak and fitness score to ensure correctness
-      const correctStreak = calculateWeeklyStreak(
-        mergedUser.weeklyHistory,
+      // Check if streak has expired since last workout, then recalculate fitness score
+      const correctStreak = checkStreakExpiry(
+        mergedUser.currentStreak,
+        mergedUser.lastWorkoutDate,
         mergedUser.weeklyTarget
       );
 
@@ -173,6 +178,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           .from('profiles')
           .update({
             current_streak: correctStreak,
+            best_streak: Math.max(mergedUser.bestStreak, correctStreak),
             fitness_score: score,
             fitness_breakdown: breakdown,
             rank: computedRank,

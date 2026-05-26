@@ -18,7 +18,6 @@ import { AppText } from '@/components/ui/AppText';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
-import { calculateWeeklyStreak } from '@/constants/ranks';
 import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 
 const WEEKLY_OPTIONS = [2, 3, 4, 5, 6, 7];
@@ -38,15 +37,12 @@ export default function GoalsScreen() {
 
   const saveGoals = useCallback(() => {
     const validVolume = Math.max(0, Math.min(100000, currentVolume));
-    // Recalculate streak when target changes — same history, new threshold
-    const newStreak = calculateWeeklyStreak(user.weeklyHistory, weeklyTarget);
     updateUser({
       weeklyTarget,
       monthlyVolumeGoal: validVolume,
-      currentStreak: newStreak,
     });
     router.back();
-  }, [weeklyTarget, currentVolume, updateUser, user.weeklyHistory]);
+  }, [weeklyTarget, currentVolume, updateUser]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: 'transparent' }]} edges={['top']}>
