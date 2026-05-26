@@ -59,12 +59,12 @@ export const TIER_THRESHOLDS: Record<SubTier, number> = {
 
 /** Dark-mode rank colors */
 const DARK_TIER_COLORS: Record<MainTier, string> = {
-  Bronze: '#CD7F32',
-  Silver: '#C0C0C0',
-  Gold: '#FFD700',
-  Platinum: '#E5E4E2',
-  Diamond: '#B9F2FF',
-  Immortal: '#FF0040',
+  Bronze: '#b46432',
+  Silver: '#b0b8c4',
+  Gold: '#ffb900',
+  Platinum: '#00dcc8',
+  Diamond: '#64a0ff',
+  Immortal: '#ff3c78',
 };
 
 /** Light-mode rank colors (darker variants for white-card readability) */

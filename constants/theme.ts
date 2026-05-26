@@ -5,7 +5,6 @@
  * Light = iOS-premium clean with deep forest accents.
  */
 
-import { Platform } from 'react-native';
 import { ThemeName } from '@/types/user';
 
 export interface ThemeColors {
@@ -27,17 +26,17 @@ export interface ThemeColors {
 }
 
 const darkTheme: ThemeColors = {
-  background: '#0F0F0F',
-  card: '#1A1A1A',
-  border: '#2A2A2A',
+  background: '#08080f',
+  card: '#0d0d18',
+  border: '#1a1a28',
   text: '#FFFFFF',
-  textSecondary: '#9CA3AF',
-  primary: '#00FF88',
-  secondary: '#FF6B00',
+  textSecondary: '#888888',
+  primary: '#00ffe0',
+  secondary: '#7b2fff',
   gold: '#FFD700',
   silver: '#C0C0C0',
   bronze: '#CD7F32',
-  primaryDark: '#00CC6A',
+  primaryDark: '#00c8b4',
   danger: '#FF4444',
   shadow: '#000000',
   gloss: 'rgba(255,255,255,0.15)',
@@ -98,23 +97,10 @@ export function getThemeColors(name: ThemeName): ThemeColors {
  */
 export const Colors = darkTheme;
 
-export const Fonts = Platform.select({
-  ios: {
-    sans: 'system-ui',
-    serif: 'ui-serif',
-    rounded: 'ui-rounded',
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+export const Fonts = {
+  sans: 'SpaceGrotesk_400Regular',
+  medium: 'SpaceGrotesk_500Medium',
+  semibold: 'SpaceGrotesk_600SemiBold',
+  bold: 'SpaceGrotesk_700Bold',
+  mono: 'SpaceGrotesk_400Regular',
+};
