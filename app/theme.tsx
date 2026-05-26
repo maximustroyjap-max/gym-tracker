@@ -4,10 +4,12 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemeName } from '@/types/user';
@@ -55,16 +57,16 @@ export default function ThemeScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>App Theme</Text>
-        <Text style={[styles.subtitle, { color: Colors.textSecondary }]}>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>App Theme</AppText>
+        <AppText style={[styles.subtitle, { color: Colors.textSecondary }]}>
           Choose the look that fits your style
-        </Text>
+        </AppText>
 
         {/* Theme Options */}
         <View style={styles.optionsList}>
@@ -88,28 +90,28 @@ export default function ThemeScreen() {
                 {/* Color Palette Strip */}
                 <View style={styles.previewRow}>
                   <View style={[styles.colorSwatch, { backgroundColor: tc.background }]}>
-                    <Text style={[styles.swatchLabel, { color: tc.textSecondary }]}>BG</Text>
+                    <AppText weight="semibold" style={[styles.swatchLabel, { color: tc.textSecondary }]}>BG</AppText>
                   </View>
                   <View style={[styles.colorSwatch, { backgroundColor: tc.card }]}>
-                    <Text style={[styles.swatchLabel, { color: tc.textSecondary }]}>Card</Text>
+                    <AppText weight="semibold" style={[styles.swatchLabel, { color: tc.textSecondary }]}>Card</AppText>
                   </View>
                   <View style={[styles.colorSwatchAccent, { backgroundColor: tc.primary }]}>
-                    <Text style={[styles.swatchLabelAccent, { color: tc.background }]}>P</Text>
+                    <AppText weight="bold" style={[styles.swatchLabelAccent, { color: tc.background }]}>P</AppText>
                   </View>
                   <View style={[styles.colorSwatchAccent, { backgroundColor: tc.secondary }]}>
-                    <Text style={[styles.swatchLabelAccent, { color: tc.background }]}>S</Text>
+                    <AppText weight="bold" style={[styles.swatchLabelAccent, { color: tc.background }]}>S</AppText>
                   </View>
                 </View>
 
                 {/* Label + Selection */}
                 <View style={styles.labelRow}>
                   <View>
-                    <Text style={[styles.themeLabel, { color: tc.text }]}>
+                    <AppText weight="bold" style={[styles.themeLabel, { color: tc.text }]}>
                       {option.label}
-                    </Text>
-                    <Text style={[styles.themeSubtitle, { color: tc.textSecondary }]}>
+                    </AppText>
+                    <AppText style={[styles.themeSubtitle, { color: tc.textSecondary }]}>
                       {option.subtitle}
-                    </Text>
+                    </AppText>
                   </View>
                   <View
                     style={[
@@ -137,13 +139,12 @@ export default function ThemeScreen() {
       {hasChanges && (
         <View style={[styles.saveButtonContainer, { backgroundColor: Colors.background + 'EE' }]}>
           <TouchableOpacity
-            style={[styles.saveButton, { backgroundColor: Colors.primary }]
-}
+            style={[styles.saveButton, { backgroundColor: Colors.primary }]}
             onPress={saveTheme}
             activeOpacity={activeOpacity.button}>
-            <Text style={[styles.saveButtonText, { color: Colors.background }]}>
+            <AppText weight="bold" style={[styles.saveButtonText, { color: Colors.background }]}>
               Save Theme
-            </Text>
+            </AppText>
           </TouchableOpacity>
         </View>
       )}
@@ -176,12 +177,10 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
   },
   subtitle: {
@@ -223,11 +222,9 @@ const styles = StyleSheet.create({
   },
   swatchLabel: {
     fontSize: typography.xs,
-    fontWeight: '600',
   },
   swatchLabelAccent: {
     fontSize: typography.xs,
-    fontWeight: '700',
   },
   labelRow: {
     flexDirection: 'row',
@@ -236,7 +233,6 @@ const styles = StyleSheet.create({
   },
   themeLabel: {
     fontSize: typography.lg,
-    fontWeight: '700',
   },
   themeSubtitle: {
     fontSize: typography.sm,
@@ -268,6 +264,5 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
 });

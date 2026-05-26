@@ -4,10 +4,12 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 
@@ -73,13 +75,13 @@ export default function PrivacyPolicyScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Privacy Policy</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Privacy Policy</AppText>
 
         {/* Hero Banner */}
         <View
@@ -94,14 +96,14 @@ export default function PrivacyPolicyScreen() {
           <View style={[styles.heroIcon, { backgroundColor: Colors.primary + '12' }]}>
             <MaterialIcons name="lock" size={32} color={Colors.primary} />
           </View>
-          <Text style={[styles.heroTitle, { color: Colors.text }]}>Your Privacy Matters</Text>
-          <Text style={[styles.heroSubtitle, { color: Colors.textSecondary }]}>
+          <AppText weight="bold" style={[styles.heroTitle, { color: Colors.text }]}>Your Privacy Matters</AppText>
+          <AppText style={[styles.heroSubtitle, { color: Colors.textSecondary }]}>
             Your data is secure, encrypted, and always under your control.
-          </Text>
+          </AppText>
         </View>
 
         {/* Section Label */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Our Principles</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Our Principles</AppText>
 
         {/* Privacy Cards */}
         <View style={styles.cardsList}>
@@ -120,19 +122,19 @@ export default function PrivacyPolicyScreen() {
                 <MaterialIcons name={item.icon} size={22} color={Colors.primary} />
               </View>
               <View style={styles.cardText}>
-                <Text style={[styles.cardTitle, { color: Colors.text }]}>{item.title}</Text>
-                <Text style={[styles.cardBody, { color: Colors.textSecondary }]}>
+                <AppText weight="bold" style={[styles.cardTitle, { color: Colors.text }]}>{item.title}</AppText>
+                <AppText style={[styles.cardBody, { color: Colors.textSecondary }]}>
                   {item.description}
-                </Text>
+                </AppText>
               </View>
             </View>
           ))}
         </View>
 
         {/* Footer Note */}
-        <Text style={[styles.footer, { color: Colors.textSecondary }]}>
+        <AppText style={[styles.footer, { color: Colors.textSecondary }]}>
           Last updated: June 2026
-        </Text>
+        </AppText>
       </ScrollView>
     </SafeAreaView>
   );
@@ -163,12 +165,10 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontSize: typography['2xl'],
-    fontWeight: 'bold',
     marginBottom: spacing.sm,
   },
   heroSubtitle: {
@@ -203,7 +202,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
@@ -238,7 +236,6 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: typography.lg,
-    fontWeight: '700',
   },
   cardBody: {
     fontSize: typography.base,

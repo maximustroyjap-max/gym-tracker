@@ -5,10 +5,12 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, activeOpacity } from '@/constants/design';
@@ -56,16 +58,16 @@ export default function EditProfileScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Edit Profile</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Edit Profile</AppText>
 
         {/* Avatar Selection */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Profile Picture</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Profile Picture</AppText>
         <View
           style={[
             styles.card,
@@ -112,9 +114,9 @@ export default function EditProfileScreen() {
               ]}
               onPress={() => setSelectedAvatar('')}
               activeOpacity={activeOpacity.button}>
-              <Text style={[styles.avatarFallbackText, { color: Colors.textSecondary }]}>
+              <AppText weight="bold" style={[styles.avatarFallbackText, { color: Colors.textSecondary }]}>
                 A-Z
-              </Text>
+              </AppText>
               {selectedAvatar === '' && (
                 <View style={[styles.checkmark, { backgroundColor: Colors.primary }]}>
                   <MaterialIcons name="check" size={12} color={Colors.background} />
@@ -125,7 +127,7 @@ export default function EditProfileScreen() {
         </View>
 
         {/* Display Name */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Display Name</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Display Name</AppText>
         <View
           style={[
             styles.card,
@@ -147,7 +149,7 @@ export default function EditProfileScreen() {
         </View>
 
         {/* Personal Goal */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Personal Goal</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Personal Goal</AppText>
         <View
           style={[
             styles.card,
@@ -168,9 +170,9 @@ export default function EditProfileScreen() {
             numberOfLines={3}
             textAlignVertical="top"
           />
-          <Text style={[styles.charCount, { color: Colors.textSecondary }]}>
+          <AppText style={[styles.charCount, { color: Colors.textSecondary }]}>
             {personalGoal.length}/120
-          </Text>
+          </AppText>
         </View>
 
         {/* Spacer for save button */}
@@ -184,7 +186,7 @@ export default function EditProfileScreen() {
             style={[styles.saveButton, { backgroundColor: Colors.primary }]}
             onPress={saveProfile}
             activeOpacity={activeOpacity.button}>
-            <Text style={[styles.saveButtonText, { color: Colors.background }]}>Save Profile</Text>
+            <AppText weight="bold" style={[styles.saveButtonText, { color: Colors.background }]}>Save Profile</AppText>
           </TouchableOpacity>
         </View>
       )}
@@ -217,18 +219,15 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.xl,
@@ -266,7 +265,6 @@ const styles = StyleSheet.create({
   },
   avatarFallbackText: {
     fontSize: typography.sm,
-    fontWeight: '700',
   },
   checkmark: {
     position: 'absolute',
@@ -311,6 +309,5 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
 });

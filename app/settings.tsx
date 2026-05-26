@@ -4,13 +4,14 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { NeonCard } from '@/components/NeonCard';
 import { SettingsRow } from '@/components/SettingsRow';
 import { ConfirmationPopup } from '@/components/ConfirmationPopup';
-import { GlassCard } from '@/components/GlassCard';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
@@ -45,17 +46,17 @@ export default function SettingsScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Settings</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Settings</AppText>
 
         {/* General */}
         <SectionTitle colors={Colors}>General</SectionTitle>
-        <GlassCard intensity={30} borderRadius={radius.lg} style={styles.card} contentStyle={styles.cardContent}>
+        <NeonCard borderRadius={radius.lg}>
           <SettingsRow
             icon="notifications"
             label="Notifications"
@@ -73,11 +74,11 @@ export default function SettingsScreen() {
             label="Advanced Settings"
             onPress={() => router.push('/advanced')}
           />
-        </GlassCard>
+        </NeonCard>
 
         {/* Appearance */}
         <SectionTitle colors={Colors}>Appearance</SectionTitle>
-        <GlassCard intensity={30} borderRadius={radius.lg} style={styles.card} contentStyle={styles.cardContent}>
+        <NeonCard borderRadius={radius.lg}>
           <SettingsRow
             icon="palette"
             label="App Theme"
@@ -90,22 +91,22 @@ export default function SettingsScreen() {
             label="App Icon"
             onPress={() => {}}
           />
-        </GlassCard>
+        </NeonCard>
 
         {/* Log Workout Settings */}
         <SectionTitle colors={Colors}>Log Workout Settings</SectionTitle>
-        <GlassCard intensity={30} borderRadius={radius.lg} style={styles.card} contentStyle={styles.cardContent}>
+        <NeonCard borderRadius={radius.lg}>
           <SettingsRow
             icon="timer"
             label="Rest Timer Settings"
             value={`${Math.floor(user.restTimerSettings.durationSeconds / 60)} min`}
             onPress={() => router.push('/rest-timer-settings')}
           />
-        </GlassCard>
+        </NeonCard>
 
         {/* Account */}
         <SectionTitle colors={Colors}>Account</SectionTitle>
-        <GlassCard intensity={30} borderRadius={radius.lg} style={styles.card} contentStyle={styles.cardContent}>
+        <NeonCard borderRadius={radius.lg}>
           <SettingsRow
             icon="person"
             label="Edit Profile"
@@ -130,11 +131,11 @@ export default function SettingsScreen() {
             danger
             onPress={() => setShowLogoutPopup(true)}
           />
-        </GlassCard>
+        </NeonCard>
 
         {/* Support & About */}
         <SectionTitle colors={Colors}>Support &amp; About</SectionTitle>
-        <GlassCard intensity={30} borderRadius={radius.lg} style={styles.card} contentStyle={styles.cardContent}>
+        <NeonCard borderRadius={radius.lg}>
           <SettingsRow
             icon="help"
             label="Help & Support"
@@ -159,11 +160,11 @@ export default function SettingsScreen() {
             value="1.0.0"
             hideChevron
           />
-        </GlassCard>
+        </NeonCard>
 
         {/* Data */}
         <SectionTitle colors={Colors}>Data</SectionTitle>
-        <GlassCard intensity={30} borderRadius={radius.lg} style={styles.card} contentStyle={styles.cardContent}>
+        <NeonCard borderRadius={radius.lg}>
           <SettingsRow
             icon="share"
             label="Export Workout Data"
@@ -176,7 +177,7 @@ export default function SettingsScreen() {
             danger
             onPress={() => setShowResetPopup(true)}
           />
-        </GlassCard>
+        </NeonCard>
       </ScrollView>
 
       {/* Logout Confirmation */}
@@ -211,7 +212,7 @@ export default function SettingsScreen() {
 }
 
 function SectionTitle({ children, colors }: { children: React.ReactNode; colors: ReturnType<typeof useTheme> }) {
-  return <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{children}</Text>;
+  return <AppText weight="semibold" style={[styles.sectionTitle, { color: colors.textSecondary }]}>{children}</AppText>;
 }
 
 function Divider({ colors }: { colors: ReturnType<typeof useTheme> }) {
@@ -243,29 +244,20 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
     marginLeft: spacing.xs,
-  },
-  card: {
-    overflow: 'hidden',
-  },
-  cardContent: {
-    overflow: 'hidden',
   },
   divider: {
     height: 1,

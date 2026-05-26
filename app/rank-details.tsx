@@ -8,7 +8,6 @@
 import React, { useRef, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -17,6 +16,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { NeonCard } from '@/components/NeonCard';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import {
@@ -64,8 +66,6 @@ export default function RankDetailsScreen() {
     outputRange: ['0%', '100%'],
   });
 
-  // (No per-element animations on this screen)
-
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -75,24 +75,20 @@ export default function RankDetailsScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Rank System</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Rank System</AppText>
 
         {/* ── Hero Rank Card ── */}
-        <View
-          style={[
-            styles.heroCard,
-            {
-              backgroundColor: Colors.card,
-              borderColor: rankColor + '35',
-              shadowColor: rankColor,
-            },
-          ]}>
+        <NeonCard
+          borderRadius={radius['2xl']}
+          glowColor={rankColor}
+          style={{ marginBottom: spacing.xs }}
+        >
           {/* Soft glow behind rank */}
           <View style={[styles.glowOrb, { backgroundColor: rankColor + '10' }]} />
 
@@ -107,21 +103,21 @@ export default function RankDetailsScreen() {
                 gloss
                 animated
               />
-              <Text style={[styles.tierName, { color: rankColor }]}>{currentSubTier}</Text>
+              <AppText weight="bold" style={[styles.tierName, { color: rankColor }]}>{currentSubTier}</AppText>
             </View>
 
             <View style={styles.scoreRow}>
-              <Text style={[styles.scoreNumber, { color: Colors.text }]}>{user.fitnessScore}</Text>
-              <Text style={[styles.scoreTotal, { color: Colors.textSecondary }]}>/ 100</Text>
+              <AppText weight="bold" style={[styles.scoreNumber, { color: Colors.text }]}>{user.fitnessScore}</AppText>
+              <AppText style={[styles.scoreTotal, { color: Colors.textSecondary }]}>/ 100</AppText>
             </View>
 
             {nextSubTier ? (
-              <Text style={[styles.nextTierText, { color: Colors.textSecondary }]}>
+              <AppText style={[styles.nextTierText, { color: Colors.textSecondary }]}>
                 {pointsToNext} point{pointsToNext !== 1 ? 's' : ''} to{' '}
-                <Text style={{ color: rankColor, fontWeight: 'bold' }}>{nextSubTier}</Text>
-              </Text>
+                <AppText weight="bold" style={{ color: rankColor }}>{nextSubTier}</AppText>
+              </AppText>
             ) : (
-              <Text style={[styles.nextTierText, { color: rankColor }]}>Maximum rank achieved</Text>
+              <AppText weight="medium" style={[styles.nextTierText, { color: rankColor }]}>Maximum rank achieved</AppText>
             )}
 
             {/* Progress to next sub-tier — animated */}
@@ -137,14 +133,14 @@ export default function RankDetailsScreen() {
               />
             </View>
 
-            <Text style={[styles.progressPercentLabel, { color: Colors.textSecondary }]}>
+            <AppText weight="medium" style={[styles.progressPercentLabel, { color: Colors.textSecondary }]}>
               {Math.round(tierProgress * 100)}% to next rank
-            </Text>
+            </AppText>
           </View>
-        </View>
+        </NeonCard>
 
         {/* ── 4 Pillars Section ── */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Score Breakdown</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Score Breakdown</AppText>
 
         <PillarCard
           label="Consistency"
@@ -170,7 +166,7 @@ export default function RankDetailsScreen() {
           label="Progression"
           value={user.fitnessBreakdown.progression}
           weight={20}
-          color={Colors.gold}
+          color={Colors.primary}
           icon="trending-up"
           description="PRs & weight increases month over month."
           penalty="Plateaus slow your climb."
@@ -180,7 +176,7 @@ export default function RankDetailsScreen() {
           label="Variety"
           value={user.fitnessBreakdown.variety}
           weight={10}
-          color={Colors.bronze}
+          color={Colors.secondary}
           icon="category"
           description="Unique exercises & muscle groups used."
           penalty="Repeating the same lifts caps this."
@@ -188,57 +184,49 @@ export default function RankDetailsScreen() {
         />
 
         {/* ── Formula Card ── */}
-        <View
-          style={[
-            styles.formulaCard,
-            {
-              backgroundColor: Colors.card,
-              borderColor: Colors.border,
-              shadowColor: Colors.shadow,
-            },
-          ]}>
+        <NeonCard
+          borderRadius={radius.xl}
+          style={{ marginTop: spacing.xs, marginBottom: spacing.md }}
+          contentStyle={{ padding: spacing.lg }}
+        >
           <View style={styles.formulaHeader}>
             <View style={[styles.formulaIconBox, { backgroundColor: Colors.primary + '18' }]}>
               <MaterialIcons name="functions" size={18} color={Colors.primary} />
             </View>
-            <Text style={[styles.formulaTitle, { color: Colors.text }]}>Formula</Text>
+            <AppText weight="bold" style={[styles.formulaTitle, { color: Colors.text }]}>Formula</AppText>
           </View>
           <View style={[styles.formulaCodeBlock, { backgroundColor: Colors.background }]}>
-            <Text style={[styles.formulaCode, { color: Colors.textSecondary }]}>
+            <AppText style={[styles.formulaCode, { color: Colors.textSecondary }]}>
               Fitness Score = (Consistency × 0.40) + (Volume × 0.30) + (Progression × 0.20) + (Variety × 0.10)
-            </Text>
+            </AppText>
           </View>
-        </View>
+        </NeonCard>
 
         {/* ── Weekly Target Connection ── */}
-        <View
-          style={[
-            styles.infoCard,
-            {
-              backgroundColor: Colors.card,
-              borderColor: Colors.border,
-              shadowColor: Colors.shadow,
-            },
-          ]}>
+        <NeonCard
+          borderRadius={radius.xl}
+          style={{ marginBottom: spacing.md }}
+          contentStyle={{ padding: spacing.lg }}
+        >
           <View style={styles.infoHeader}>
             <View style={[styles.infoIconBox, { backgroundColor: Colors.primary + '18' }]}>
               <MaterialIcons name="fitness-center" size={18} color={Colors.primary} />
             </View>
             <View>
-              <Text style={[styles.infoTitle, { color: Colors.text }]}>Weekly Target</Text>
-              <Text style={[styles.infoSubtitle, { color: Colors.textSecondary }]}>
+              <AppText weight="bold" style={[styles.infoTitle, { color: Colors.text }]}>Weekly Target</AppText>
+              <AppText style={[styles.infoSubtitle, { color: Colors.textSecondary }]}>
                 {user.weeklyTarget} workouts / week
-              </Text>
+              </AppText>
             </View>
           </View>
-          <Text style={[styles.infoBody, { color: Colors.textSecondary }]}>
+          <AppText style={[styles.infoBody, { color: Colors.textSecondary }]}>
             Hitting this maximizes your Consistency score (40% of your total). Missing weeks applies
             escalating penalties that can drop your sub-tier.
-          </Text>
-        </View>
+          </AppText>
+        </NeonCard>
 
         {/* ── All Tiers ── */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>All Tiers</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>All Tiers</AppText>
 
         {MAIN_TIERS.map((mainTier) => {
           const mainColor = getTierColor(mainTier + ' 1', user.theme);
@@ -267,17 +255,18 @@ export default function RankDetailsScreen() {
                 <View style={[styles.tierGroupHeader, { borderBottomColor: Colors.border }]}>
                   <View style={styles.tierGroupTitleRow}>
                     <RankIcon rank={mainTier} size={20} glow glowColor={mainColor} glowIntensity="subtle" />
-                    <Text
+                    <AppText
+                      weight="bold"
                       style={[
                         styles.tierGroupName,
                         { color: isCurrentMainTier ? mainColor : Colors.text },
                       ]}>
                       {mainTier}
-                    </Text>
+                    </AppText>
                   </View>
                   {isCurrentMainTier && (
                     <View style={[styles.currentBadge, { backgroundColor: mainColor + '18' }]}>
-                      <Text style={[styles.currentBadgeText, { color: mainColor }]}>Current</Text>
+                      <AppText weight="bold" style={[styles.currentBadgeText, { color: mainColor }]}>Current</AppText>
                     </View>
                   )}
                 </View>
@@ -300,7 +289,8 @@ export default function RankDetailsScreen() {
                         isCurrent && { backgroundColor: mainColor + '08' },
                       ]}>
                       <View style={styles.subTierLeft}>
-                        <Text
+                        <AppText
+                          weight="semibold"
                           style={[
                             styles.subTierName,
                             {
@@ -312,16 +302,16 @@ export default function RankDetailsScreen() {
                             },
                           ]}>
                           {subTier}
-                        </Text>
-                        <Text style={[styles.subTierThreshold, { color: Colors.textSecondary }]}>
+                        </AppText>
+                        <AppText style={[styles.subTierThreshold, { color: Colors.textSecondary }]}>
                           {threshold}+ pts
-                        </Text>
+                        </AppText>
                       </View>
                       <View style={styles.subTierRight}>
                         {isCurrent ? (
                           <MaterialIcons name="radio-button-checked" size={22} color={mainColor} />
                         ) : isUnlocked ? (
-                          <MaterialIcons name="check-circle" size={22} color={Colors.primary} />
+                          <IconSymbol name="checkmark.circle.fill" size={22} color={Colors.primary} />
                         ) : (
                           <MaterialIcons name="lock" size={20} color={Colors.textSecondary + '80'} />
                         )}
@@ -358,15 +348,11 @@ function PillarCard({
   Colors: ReturnType<typeof useTheme>;
 }) {
   return (
-    <View
-      style={[
-        styles.pillarCard,
-        {
-          backgroundColor: Colors.card,
-          borderColor: Colors.border,
-          shadowColor: Colors.shadow,
-        },
-      ]}>
+    <NeonCard
+      borderRadius={radius.xl}
+      style={{ marginBottom: spacing.md }}
+      contentStyle={{ padding: spacing.lg }}
+    >
       {/* Top row: icon + label/weight/description on left, big value on right */}
       <View style={styles.pillarTopRow}>
         <View style={styles.pillarTopLeft}>
@@ -376,17 +362,17 @@ function PillarCard({
           </View>
           <View style={styles.pillarInfo}>
             <View style={styles.pillarLabelRow}>
-              <Text style={[styles.pillarLabel, { color: Colors.text }]}>{label}</Text>
+              <AppText weight="semibold" style={[styles.pillarLabel, { color: Colors.text }]}>{label}</AppText>
               <View style={[styles.weightBadge, { backgroundColor: color + '15' }]}>
-                <Text style={[styles.weightText, { color }]}>{weight}%</Text>
+                <AppText weight="bold" style={[styles.weightText, { color }]}>{weight}%</AppText>
               </View>
             </View>
-            <Text style={[styles.pillarDescription, { color: Colors.textSecondary }]} numberOfLines={2}>
+            <AppText style={[styles.pillarDescription, { color: Colors.textSecondary }]} numberOfLines={2}>
               {description}
-            </Text>
+            </AppText>
           </View>
         </View>
-        <Text style={[styles.pillarValue, { color }]}>{Math.round(value)}</Text>
+        <AppText weight="bold" style={[styles.pillarValue, { color }]}>{Math.round(value)}</AppText>
       </View>
 
       {/* Progress bar */}
@@ -396,8 +382,8 @@ function PillarCard({
       </View>
 
       {/* Penalty tip */}
-      <Text style={[styles.pillarPenalty, { color: Colors.danger + 'CC' }]}>{penalty}</Text>
-    </View>
+      <AppText style={[styles.pillarPenalty, { color: Colors.danger + 'CC' }]}>{penalty}</AppText>
+    </NeonCard>
   );
 }
 
@@ -426,29 +412,15 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
 
   /* ── Hero Rank Card ── */
-  heroCard: {
-    borderRadius: radius['2xl'],
-    borderWidth: 1,
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    elevation: 6,
-    overflow: 'hidden',
-    position: 'relative',
-  },
   glowOrb: {
     position: 'absolute',
     width: 180,
@@ -472,14 +444,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     gap: spacing.sm,
   },
-  tierDot: {
-    width: 12,
-    height: 12,
-    borderRadius: radius.full,
-  },
   tierName: {
     fontSize: typography.xl,
-    fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1.5,
   },
@@ -490,7 +456,6 @@ const styles = StyleSheet.create({
   },
   scoreNumber: {
     fontSize: typography['4xl'],
-    fontWeight: 'bold',
   },
   scoreTotal: {
     fontSize: typography.xl,
@@ -522,13 +487,11 @@ const styles = StyleSheet.create({
   },
   progressPercentLabel: {
     fontSize: typography.xs,
-    fontWeight: '500',
   },
 
   /* ── Section Title ── */
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing['2xl'],
@@ -537,16 +500,6 @@ const styles = StyleSheet.create({
   },
 
   /* ── Pillar Card ── */
-  pillarCard: {
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
   pillarTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -579,7 +532,6 @@ const styles = StyleSheet.create({
   },
   pillarLabel: {
     fontSize: typography.lg,
-    fontWeight: '600',
   },
   pillarDescription: {
     fontSize: typography.sm,
@@ -587,7 +539,6 @@ const styles = StyleSheet.create({
   },
   pillarValue: {
     fontSize: typography['2xl'],
-    fontWeight: 'bold',
     minWidth: 40,
     textAlign: 'right',
     marginTop: 2,
@@ -599,7 +550,6 @@ const styles = StyleSheet.create({
   },
   weightText: {
     fontSize: typography.xs,
-    fontWeight: 'bold',
   },
   pillarTrack: {
     height: 8,
@@ -626,17 +576,6 @@ const styles = StyleSheet.create({
   },
 
   /* ── Formula Card ── */
-  formulaCard: {
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    padding: spacing.lg,
-    marginTop: spacing.xs,
-    marginBottom: spacing.md,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
   formulaHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -652,7 +591,6 @@ const styles = StyleSheet.create({
   },
   formulaTitle: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
   formulaCodeBlock: {
     borderRadius: radius.lg,
@@ -664,16 +602,6 @@ const styles = StyleSheet.create({
   },
 
   /* ── Info Card ── */
-  infoCard: {
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
   infoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -689,7 +617,6 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
   infoSubtitle: {
     fontSize: typography.sm,
@@ -735,14 +662,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  tierGroupDot: {
-    width: 10,
-    height: 10,
-    borderRadius: radius.full,
-  },
   tierGroupName: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -753,7 +674,6 @@ const styles = StyleSheet.create({
   },
   currentBadgeText: {
     fontSize: typography.xs,
-    fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -772,7 +692,6 @@ const styles = StyleSheet.create({
   },
   subTierName: {
     fontSize: typography.base,
-    fontWeight: '600',
   },
   subTierThreshold: {
     fontSize: typography.xs,
@@ -783,5 +702,4 @@ const styles = StyleSheet.create({
     minWidth: 36,
     overflow: 'visible',
   },
-  // (Current tier uses MaterialIcons radio-button-checked instead of custom ring)
 });

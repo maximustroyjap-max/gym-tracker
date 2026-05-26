@@ -34,6 +34,7 @@ const MAPPING = {
   'settings': 'settings',
   'arrow.up.arrow.down': 'swap-vert',
   'flag': 'flag',
+  'chevron.left': 'chevron-left',
 } as IconMapping;
 
 /**

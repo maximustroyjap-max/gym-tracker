@@ -6,7 +6,6 @@
 import React, { useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -17,6 +16,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { SOUND_OPTIONS, playAlertSound } from '@/utils/sound';
@@ -67,16 +68,16 @@ export default function RestTimerSettingsScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Rest Timer</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Rest Timer</AppText>
 
         {/* Duration */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Duration</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Duration</AppText>
         <View
           style={[
             styles.card,
@@ -86,9 +87,9 @@ export default function RestTimerSettingsScreen() {
               shadowColor: Colors.shadow,
             },
           ]}>
-          <Text style={[styles.cardLabel, { color: Colors.textSecondary }]}>
+          <AppText weight="medium" style={[styles.cardLabel, { color: Colors.textSecondary }]}>
             Time between sets
-          </Text>
+          </AppText>
           <View style={styles.durationRow}>
             <View style={styles.inputGroup}>
               <TextInput
@@ -103,9 +104,9 @@ export default function RestTimerSettingsScreen() {
                 placeholder="2"
                 placeholderTextColor={Colors.textSecondary}
               />
-              <Text style={[styles.timeUnit, { color: Colors.textSecondary }]}>min</Text>
+              <AppText style={[styles.timeUnit, { color: Colors.textSecondary }]}>min</AppText>
             </View>
-            <Text style={[styles.colon, { color: Colors.text }]}>:</Text>
+            <AppText weight="bold" style={[styles.colon, { color: Colors.text }]}>:</AppText>
             <View style={styles.inputGroup}>
               <TextInput
                 style={[
@@ -123,13 +124,13 @@ export default function RestTimerSettingsScreen() {
                 placeholder="00"
                 placeholderTextColor={Colors.textSecondary}
               />
-              <Text style={[styles.timeUnit, { color: Colors.textSecondary }]}>sec</Text>
+              <AppText style={[styles.timeUnit, { color: Colors.textSecondary }]}>sec</AppText>
             </View>
           </View>
         </View>
 
         {/* Sound Effect */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Alert Sound</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Alert Sound</AppText>
         <TouchableOpacity
           style={[
             styles.card,
@@ -142,15 +143,15 @@ export default function RestTimerSettingsScreen() {
               <MaterialIcons name="volume-up" size={22} color={Colors.primary} />
             </View>
             <View style={styles.soundInfo}>
-              <Text style={[styles.soundLabel, { color: Colors.text }]}>Sound Effect</Text>
-              <Text style={[styles.soundValue, { color: Colors.textSecondary }]}>{soundLabel}</Text>
+              <AppText weight="semibold" style={[styles.soundLabel, { color: Colors.text }]}>Sound Effect</AppText>
+              <AppText style={[styles.soundValue, { color: Colors.textSecondary }]}>{soundLabel}</AppText>
             </View>
-            <MaterialIcons name="chevron-right" size={20} color={Colors.textSecondary} />
+            <IconSymbol name="chevron.right" size={20} color={Colors.textSecondary} />
           </View>
         </TouchableOpacity>
 
         {/* Display Mode */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Display Mode</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Display Mode</AppText>
         <View
           style={[
             styles.card,
@@ -190,7 +191,7 @@ export default function RestTimerSettingsScreen() {
             style={[styles.saveButton, { backgroundColor: Colors.primary }]}
             onPress={saveSettings}
             activeOpacity={activeOpacity.button}>
-            <Text style={[styles.saveButtonText, { color: Colors.background }]}>Save</Text>
+            <AppText weight="bold" style={[styles.saveButtonText, { color: Colors.background }]}>Save</AppText>
           </TouchableOpacity>
         </View>
       )}
@@ -209,7 +210,7 @@ export default function RestTimerSettingsScreen() {
               styles.modalContent,
               { backgroundColor: Colors.card, borderColor: Colors.border, shadowColor: Colors.shadow },
             ]}>
-            <Text style={[styles.modalTitle, { color: Colors.text }]}>Select Sound</Text>
+            <AppText weight="bold" style={[styles.modalTitle, { color: Colors.text }]}>Select Sound</AppText>
             <View style={styles.soundList}>
               {SOUND_OPTIONS.map((option) => (
                 <TouchableOpacity
@@ -228,14 +229,14 @@ export default function RestTimerSettingsScreen() {
                     }
                   }}
                   activeOpacity={activeOpacity.row}>
-                  <Text
+                  <AppText
+                    weight={selectedSound === option.id ? 'bold' : 'regular'}
                     style={[
                       styles.soundOptionText,
-                      { color: Colors.text },
-                      selectedSound === option.id && { color: Colors.primary, fontWeight: '700' },
+                      { color: selectedSound === option.id ? Colors.primary : Colors.text },
                     ]}>
                     {option.label}
-                  </Text>
+                  </AppText>
                   {selectedSound === option.id && (
                     <MaterialIcons name="check" size={20} color={Colors.primary} />
                   )}
@@ -246,7 +247,7 @@ export default function RestTimerSettingsScreen() {
               style={[styles.modalCloseButton, { backgroundColor: Colors.primary }]}
               onPress={() => setSoundModalVisible(false)}
               activeOpacity={activeOpacity.button}>
-              <Text style={[styles.modalCloseText, { color: Colors.background }]}>Done</Text>
+              <AppText weight="bold" style={[styles.modalCloseText, { color: Colors.background }]}>Done</AppText>
             </TouchableOpacity>
           </View>
         </Pressable>
@@ -276,8 +277,8 @@ function ModeOption({
         <MaterialIcons name={icon} size={22} color={Colors.primary} />
       </View>
       <View style={styles.modeInfo}>
-        <Text style={[styles.modeLabel, { color: Colors.text }]}>{label}</Text>
-        <Text style={[styles.modeDesc, { color: Colors.textSecondary }]}>{description}</Text>
+        <AppText weight="semibold" style={[styles.modeLabel, { color: Colors.text }]}>{label}</AppText>
+        <AppText style={[styles.modeDesc, { color: Colors.textSecondary }]}>{description}</AppText>
       </View>
       <View
         style={[
@@ -318,18 +319,15 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.xl,
@@ -377,7 +375,6 @@ const styles = StyleSheet.create({
   },
   colon: {
     fontSize: typography['2xl'],
-    fontWeight: 'bold',
     marginTop: -spacing.md,
   },
   soundRow: {
@@ -399,7 +396,6 @@ const styles = StyleSheet.create({
   },
   soundLabel: {
     fontSize: typography.lg,
-    fontWeight: '600',
   },
   soundValue: {
     fontSize: typography.sm,
@@ -417,7 +413,6 @@ const styles = StyleSheet.create({
   },
   modeLabel: {
     fontSize: typography.lg,
-    fontWeight: '600',
   },
   modeDesc: {
     fontSize: typography.sm,
@@ -455,7 +450,6 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
@@ -475,7 +469,6 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: typography.xl,
-    fontWeight: 'bold',
     marginBottom: spacing.md,
   },
   soundList: {
@@ -505,6 +498,5 @@ const styles = StyleSheet.create({
   },
   modalCloseText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
 });

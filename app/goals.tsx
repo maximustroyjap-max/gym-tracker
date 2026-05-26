@@ -6,7 +6,6 @@
 import React, { useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -15,6 +14,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { calculateWeeklyStreak } from '@/constants/ranks';
@@ -62,18 +63,18 @@ export default function GoalsScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Goals</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Goals</AppText>
 
         {/* Weekly Workout Target */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>
           Weekly Workout Target
-        </Text>
+        </AppText>
         <View
           style={[
             styles.card,
@@ -83,10 +84,10 @@ export default function GoalsScreen() {
               shadowColor: Colors.shadow,
             },
           ]}>
-          <Text style={[styles.cardDescription, { color: Colors.textSecondary }]}>
+          <AppText style={[styles.cardDescription, { color: Colors.textSecondary }]}>
             How many workouts do you want to complete each week? Hitting this target maximizes your
             Consistency score (40% of Fitness Score).
-          </Text>
+          </AppText>
 
           <View style={styles.chipRow}>
             {WEEKLY_OPTIONS.map((num) => {
@@ -104,20 +105,15 @@ export default function GoalsScreen() {
                   ]}
                   onPress={() => setWeeklyTarget(num)}
                   activeOpacity={activeOpacity.button}>
-                  <Text
-                    style={[
-                      styles.chipNumber,
-                      { color: isSelected ? Colors.primary : Colors.text },
-                    ]}>
+                  <AppText
+                    weight="bold"
+                    style={[styles.chipNumber, { color: isSelected ? Colors.primary : Colors.text }]}>
                     {num}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.chipLabel,
-                      { color: isSelected ? Colors.primary : Colors.textSecondary },
-                    ]}>
+                  </AppText>
+                  <AppText
+                    style={[styles.chipLabel, { color: isSelected ? Colors.primary : Colors.textSecondary }]}>
                     {num === 1 ? 'day' : 'days'}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               );
             })}
@@ -125,17 +121,17 @@ export default function GoalsScreen() {
 
           <View style={[styles.infoRow, { backgroundColor: Colors.background }]}>
             <MaterialIcons name="emoji-events" size={18} color={Colors.secondary} />
-            <Text style={[styles.infoText, { color: Colors.textSecondary }]}>
+            <AppText style={[styles.infoText, { color: Colors.textSecondary }]}>
               Missing a week applies escalating penalties (-5 × consecutive missed weeks) that can
               drop your tier.
-            </Text>
+            </AppText>
           </View>
         </View>
 
         {/* Monthly Volume Goal */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>
           Monthly Volume Goal
-        </Text>
+        </AppText>
         <View
           style={[
             styles.card,
@@ -145,10 +141,10 @@ export default function GoalsScreen() {
               shadowColor: Colors.shadow,
             },
           ]}>
-          <Text style={[styles.cardDescription, { color: Colors.textSecondary }]}>
+          <AppText style={[styles.cardDescription, { color: Colors.textSecondary }]}>
             Set a target for total reps across all exercises in a month. This tracks your work
             capacity and helps you push for progressive overload.
-          </Text>
+          </AppText>
 
           <View style={styles.volumeInputRow}>
             <TextInput
@@ -163,7 +159,7 @@ export default function GoalsScreen() {
               placeholderTextColor={Colors.textSecondary}
               maxLength={6}
             />
-            <Text style={[styles.volumeUnit, { color: Colors.textSecondary }]}>reps / month</Text>
+            <AppText weight="medium" style={[styles.volumeUnit, { color: Colors.textSecondary }]}>reps / month</AppText>
           </View>
 
           <View style={styles.presetRow}>
@@ -182,16 +178,14 @@ export default function GoalsScreen() {
                 ]}
                 onPress={() => setMonthlyVolume(preset.toString())}
                 activeOpacity={activeOpacity.button}>
-                <Text
+                <AppText
+                  weight={currentVolume === preset ? 'bold' : 'semibold'}
                   style={[
                     styles.presetText,
-                    {
-                      color: currentVolume === preset ? Colors.secondary : Colors.textSecondary,
-                      fontWeight: currentVolume === preset ? '700' : '600',
-                    },
+                    { color: currentVolume === preset ? Colors.secondary : Colors.textSecondary },
                   ]}>
                   {preset}
-                </Text>
+                </AppText>
               </TouchableOpacity>
             ))}
           </View>
@@ -208,7 +202,7 @@ export default function GoalsScreen() {
             style={[styles.saveButton, { backgroundColor: Colors.primary }]}
             onPress={saveGoals}
             activeOpacity={activeOpacity.button}>
-            <Text style={[styles.saveButtonText, { color: Colors.background }]}>Save Goals</Text>
+            <AppText weight="bold" style={[styles.saveButtonText, { color: Colors.background }]}>Save Goals</AppText>
           </TouchableOpacity>
         </View>
       )}
@@ -241,18 +235,15 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.xl,
@@ -291,7 +282,6 @@ const styles = StyleSheet.create({
   },
   chipNumber: {
     fontSize: typography['2xl'],
-    fontWeight: 'bold',
   },
   chipLabel: {
     fontSize: typography.xs,
@@ -326,7 +316,6 @@ const styles = StyleSheet.create({
   },
   volumeUnit: {
     fontSize: typography.base,
-    fontWeight: '500',
     width: 100,
   },
   presetRow: {
@@ -362,6 +351,5 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
 });

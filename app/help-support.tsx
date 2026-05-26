@@ -6,7 +6,6 @@
 import React, { useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -18,6 +17,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, activeOpacity } from '@/constants/design';
 
@@ -99,13 +100,13 @@ export default function HelpSupportScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Help &amp; Support</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Help &amp; Support</AppText>
 
         {/* Hero Contact Card */}
         <View
@@ -124,19 +125,19 @@ export default function HelpSupportScreen() {
             ]}>
             <MaterialIcons name="help-outline" size={32} color={Colors.primary} />
           </View>
-          <Text style={[styles.heroTitle, { color: Colors.text }]}>We&apos;re here to help</Text>
-          <Text style={[styles.heroSubtitle, { color: Colors.textSecondary }]}>
+          <AppText weight="bold" style={[styles.heroTitle, { color: Colors.text }]}>We&apos;re here to help</AppText>
+          <AppText style={[styles.heroSubtitle, { color: Colors.textSecondary }]}>
             Find answers to common questions below, or reach out if you need more support.
-          </Text>
+          </AppText>
           <View style={styles.heroFooter}>
             <View style={[styles.versionPill, { backgroundColor: Colors.background }]}>
-              <Text style={[styles.versionText, { color: Colors.textSecondary }]}>v1.0.0</Text>
+              <AppText weight="semibold" style={[styles.versionText, { color: Colors.textSecondary }]}>v1.0.0</AppText>
             </View>
           </View>
         </View>
 
         {/* FAQ Section Label */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Frequently Asked</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Frequently Asked</AppText>
 
         {/* FAQ Accordion */}
         <View style={styles.faqList}>
@@ -157,17 +158,17 @@ export default function HelpSupportScreen() {
                 activeOpacity={activeOpacity.card}>
                 <View style={styles.faqHeader}>
                   <View style={[styles.numberBadge, { backgroundColor: Colors.primary }]}>
-                    <Text style={styles.numberText}>{index + 1}</Text>
+                    <AppText weight="bold" style={styles.numberText}>{index + 1}</AppText>
                   </View>
-                  <Text style={[styles.question, { color: Colors.text }]} numberOfLines={2}>
+                  <AppText weight="semibold" style={[styles.question, { color: Colors.text }]} numberOfLines={2}>
                     {faq.question}
-                  </Text>
+                  </AppText>
                   <Animated.View
                     style={{
                       transform: [{ rotate: isOpen ? '90deg' : '0deg' }],
                     }}>
-                    <MaterialIcons
-                      name="chevron-right"
+                    <IconSymbol
+                      name="chevron.right"
                       size={20}
                       color={isOpen ? Colors.primary : Colors.textSecondary}
                     />
@@ -177,9 +178,9 @@ export default function HelpSupportScreen() {
                 {isOpen && (
                   <View style={styles.answerBox}>
                     <View style={[styles.answerDivider, { backgroundColor: Colors.border }]} />
-                    <Text style={[styles.answer, { color: Colors.textSecondary }]}>
+                    <AppText style={[styles.answer, { color: Colors.textSecondary }]}>
                       {faq.answer}
-                    </Text>
+                    </AppText>
                   </View>
                 )}
               </TouchableOpacity>
@@ -216,12 +217,10 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
@@ -246,7 +245,6 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontSize: typography['2xl'],
-    fontWeight: 'bold',
     marginBottom: spacing.sm,
   },
   heroSubtitle: {
@@ -267,11 +265,9 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
@@ -303,13 +299,11 @@ const styles = StyleSheet.create({
   },
   numberText: {
     fontSize: typography.sm,
-    fontWeight: 'bold',
     color: '#FFFFFF',
   },
   question: {
     flex: 1,
     fontSize: typography.lg,
-    fontWeight: '600',
     lineHeight: 24,
   },
   answerBox: {

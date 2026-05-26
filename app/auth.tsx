@@ -12,7 +12,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
-  Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
@@ -25,6 +24,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { Path } from 'react-native-svg';
+import { AppText } from '@/components/ui/AppText';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, activeOpacity } from '@/constants/design';
@@ -271,12 +271,12 @@ export default function AuthScreen() {
                 ]}>
                 <BrandLogo size={56} color={Colors.primary} />
               </View>
-              <Text style={[styles.appName, { color: Colors.text }]}>
+              <AppText weight="bold" style={[styles.appName, { color: Colors.text }]}>
                 ASCENT
-              </Text>
-              <Text style={[styles.appTagline, { color: Colors.textSecondary }]}>
+              </AppText>
+              <AppText weight="medium" style={[styles.appTagline, { color: Colors.textSecondary }]}>
                 Level Up Your Fitness
-              </Text>
+              </AppText>
             </Animated.View>
           </View>
 
@@ -309,25 +309,27 @@ export default function AuthScreen() {
                   style={styles.toggleButton}
                   onPress={() => animateToggle(true)}
                   activeOpacity={1}>
-                  <Text
+                  <AppText
+                    weight="semibold"
                     style={[
                       styles.toggleText,
                       { color: isLogin ? Colors.text : Colors.textSecondary },
                     ]}>
                     Login
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.toggleButton}
                   onPress={() => animateToggle(false)}
                   activeOpacity={1}>
-                  <Text
+                  <AppText
+                    weight="semibold"
                     style={[
                       styles.toggleText,
                       { color: !isLogin ? Colors.text : Colors.textSecondary },
                     ]}>
                     Sign up
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               </View>
 
@@ -381,16 +383,16 @@ export default function AuthScreen() {
                 )}
 
                 {error ? (
-                  <Text style={[styles.errorText, { color: Colors.secondary }]}>
+                  <AppText weight="medium" style={[styles.errorText, { color: Colors.secondary }]}>
                     {error}
-                  </Text>
+                  </AppText>
                 ) : null}
 
                 {authConfigError ? (
                   <View style={[styles.configErrorBanner, { backgroundColor: Colors.danger + '18', borderColor: Colors.danger + '40' }]}>
-                    <Text style={[styles.configErrorText, { color: Colors.danger }]}>
+                    <AppText weight="medium" style={[styles.configErrorText, { color: Colors.danger }]}>
                       {authConfigError}
-                    </Text>
+                    </AppText>
                   </View>
                 ) : null}
 
@@ -404,13 +406,13 @@ export default function AuthScreen() {
                   onPress={handleSubmit}
                   activeOpacity={activeOpacity.button}
                   disabled={isSubmitting}>
-                  <Text style={[styles.submitButtonText, { color: Colors.background }]}>
+                  <AppText weight="bold" style={[styles.submitButtonText, { color: Colors.background }]}>
                     {isSubmitting
                       ? 'Please wait...'
                       : isLogin
                       ? 'Login'
                       : 'Sign up'}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               </Animated.View>
             </View>
@@ -443,7 +445,7 @@ function InputField({
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={[styles.inputLabel, { color: Colors.text }]}>{label}</Text>
+      <AppText weight="semibold" style={[styles.inputLabel, { color: Colors.text }]}>{label}</AppText>
       <TextInput
         style={[
           styles.input,
@@ -496,13 +498,11 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 30,
-    fontWeight: 'bold',
     letterSpacing: 4,
   },
   appTagline: {
     fontSize: typography.sm,
     marginTop: spacing.xs,
-    fontWeight: '500',
     letterSpacing: 0.5,
   },
   formCard: {
@@ -544,7 +544,6 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: typography.base,
-    fontWeight: '600',
   },
   formFields: {
     gap: spacing.lg,
@@ -554,7 +553,6 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   input: {
     fontSize: typography.lg,
@@ -564,7 +562,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: typography.sm,
-    fontWeight: '500',
     textAlign: 'center',
     marginTop: spacing.xs,
   },
@@ -576,7 +573,6 @@ const styles = StyleSheet.create({
   },
   configErrorText: {
     fontSize: typography.sm,
-    fontWeight: '500',
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -595,6 +591,5 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
 });

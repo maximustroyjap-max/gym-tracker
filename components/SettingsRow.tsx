@@ -5,8 +5,10 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 
@@ -51,19 +53,15 @@ export function SettingsRow({
       </View>
 
       {/* Label */}
-      <Text style={[styles.label, { color: danger ? Colors.danger : Colors.text }]}>
+      <AppText style={[styles.label, { color: danger ? Colors.danger : Colors.text }]}>
         {label}
-      </Text>
+      </AppText>
 
       {/* Right side: value + chevron */}
       <View style={styles.right}>
-        {value && <Text style={[styles.valueText, { color: Colors.textSecondary }]}>{value}</Text>}
+        {value && <AppText style={[styles.valueText, { color: Colors.textSecondary }]}>{value}</AppText>}
         {!hideChevron && (
-          <MaterialIcons
-            name="chevron-right"
-            size={20}
-            color={Colors.textSecondary}
-          />
+          <IconSymbol name="chevron.right" size={20} color={Colors.textSecondary} />
         )}
       </View>
     </TouchableOpacity>
@@ -89,7 +87,6 @@ const styles = StyleSheet.create({
   label: {
     flex: 1,
     fontSize: typography.lg,
-    fontWeight: '400',
   },
   right: {
     flexDirection: 'row',

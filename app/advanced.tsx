@@ -4,10 +4,12 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
@@ -66,13 +68,13 @@ export default function AdvancedScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Advanced</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Advanced</AppText>
 
         {/* Toggle Options */}
         <View
@@ -91,10 +93,10 @@ export default function AdvancedScreen() {
                   <MaterialIcons name={option.icon} size={22} color={Colors.primary} />
                 </View>
                 <View style={styles.toggleInfo}>
-                  <Text style={[styles.toggleLabel, { color: Colors.text }]}>{option.label}</Text>
-                  <Text style={[styles.toggleDesc, { color: Colors.textSecondary }]}>
+                  <AppText weight="semibold" style={[styles.toggleLabel, { color: Colors.text }]}>{option.label}</AppText>
+                  <AppText style={[styles.toggleDesc, { color: Colors.textSecondary }]}>
                     {option.description}
-                  </Text>
+                  </AppText>
                 </View>
                 <Switch
                   value={option.value}
@@ -140,12 +142,10 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
   },
   toggleLabel: {
     fontSize: typography.lg,
-    fontWeight: '600',
   },
   toggleDesc: {
     fontSize: typography.sm,

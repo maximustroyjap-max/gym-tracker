@@ -4,10 +4,12 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
@@ -58,13 +60,13 @@ export default function NotificationsScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Notifications</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Notifications</AppText>
 
         {/* Alert Toggle */}
         <View
@@ -81,12 +83,12 @@ export default function NotificationsScreen() {
               <MaterialIcons name="notifications" size={22} color={Colors.primary} />
             </View>
             <View style={styles.toggleInfo}>
-              <Text style={[styles.toggleLabel, { color: Colors.text }]}>
+              <AppText weight="semibold" style={[styles.toggleLabel, { color: Colors.text }]}>
                 Unfinished Workout Alert
-              </Text>
-              <Text style={[styles.toggleDesc, { color: Colors.textSecondary }]}>
+              </AppText>
+              <AppText style={[styles.toggleDesc, { color: Colors.textSecondary }]}>
                 Get notified when you leave a workout running
-              </Text>
+              </AppText>
             </View>
             <Switch
               value={settings.unfinishedWorkoutAlert}
@@ -101,9 +103,9 @@ export default function NotificationsScreen() {
         {/* Delay Selector */}
         {settings.unfinishedWorkoutAlert && (
           <>
-            <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>
+            <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>
               Alert Delay
-            </Text>
+            </AppText>
             <View
               style={[
                 styles.card,
@@ -113,9 +115,9 @@ export default function NotificationsScreen() {
                   shadowColor: Colors.shadow,
                 },
               ]}>
-              <Text style={[styles.cardDescription, { color: Colors.textSecondary }]}>
+              <AppText style={[styles.cardDescription, { color: Colors.textSecondary }]}>
                 How long to wait before alerting you about an unfinished workout.
-              </Text>
+              </AppText>
               <View style={styles.chipGrid}>
                 {DELAY_OPTIONS.map((option) => {
                   const isSelected = settings.unfinishedWorkoutDelayMinutes === option.value;
@@ -134,16 +136,14 @@ export default function NotificationsScreen() {
                       ]}
                       onPress={() => setDelay(option.value)}
                       activeOpacity={activeOpacity.button}>
-                      <Text
+                      <AppText
+                        weight={isSelected ? 'bold' : 'medium'}
                         style={[
                           styles.chipText,
-                          {
-                            color: isSelected ? Colors.primary : Colors.textSecondary,
-                            fontWeight: isSelected ? '700' : '500',
-                          },
+                          { color: isSelected ? Colors.primary : Colors.textSecondary },
                         ]}>
                         {option.label}
-                      </Text>
+                      </AppText>
                     </TouchableOpacity>
                   );
                 })}
@@ -181,18 +181,15 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.xl,
@@ -229,7 +226,6 @@ const styles = StyleSheet.create({
   },
   toggleLabel: {
     fontSize: typography.lg,
-    fontWeight: '600',
   },
   toggleDesc: {
     fontSize: typography.sm,

@@ -6,7 +6,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -15,6 +14,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { AppText } from '@/components/ui/AppText';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
@@ -121,7 +122,7 @@ export default function BodyMeasurementsScreen() {
     placeholder: string
   ) => (
     <View style={styles.inputRow}>
-      <Text style={[styles.inputLabel, { color: Colors.textSecondary }]}>{label}</Text>
+      <AppText weight="medium" style={[styles.inputLabel, { color: Colors.textSecondary }]}>{label}</AppText>
       <View style={styles.inputGroup}>
         <TextInput
           style={[
@@ -135,7 +136,7 @@ export default function BodyMeasurementsScreen() {
           placeholderTextColor={Colors.textSecondary}
           maxLength={6}
         />
-        <Text style={[styles.unitLabel, { color: Colors.textSecondary }]}>{unit}</Text>
+        <AppText style={[styles.unitLabel, { color: Colors.textSecondary }]}>{unit}</AppText>
       </View>
     </View>
   );
@@ -155,16 +156,16 @@ export default function BodyMeasurementsScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
             activeOpacity={activeOpacity.row}>
-            <MaterialIcons name="chevron-left" size={28} color={Colors.primary} />
-            <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+            <IconSymbol name="chevron.left" size={28} color={Colors.primary} />
+            <AppText weight="medium" style={[styles.backText, { color: Colors.primary }]}>Back</AppText>
           </TouchableOpacity>
         </View>
 
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Body Measurements</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Body Measurements</AppText>
 
         {/* Core Stats */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Core Stats</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Core Stats</AppText>
         <View
           style={[
             styles.card,
@@ -181,7 +182,7 @@ export default function BodyMeasurementsScreen() {
           {renderInput('Age', age, setAge, 'years', '25')}
           <View style={[styles.divider, { backgroundColor: Colors.border }]} />
           <View style={styles.inputRow}>
-            <Text style={[styles.inputLabel, { color: Colors.textSecondary }]}>Gender</Text>
+            <AppText weight="medium" style={[styles.inputLabel, { color: Colors.textSecondary }]}>Gender</AppText>
             <View style={styles.genderRow}>
               {(['male', 'female'] as const).map((g) => (
                 <TouchableOpacity
@@ -196,13 +197,14 @@ export default function BodyMeasurementsScreen() {
                   ]}
                   onPress={() => setGender(g)}
                   activeOpacity={activeOpacity.button}>
-                  <Text
+                  <AppText
+                    weight="semibold"
                     style={[
                       styles.genderChipText,
                       { color: gender === g ? Colors.primary : Colors.textSecondary },
                     ]}>
                     {g === 'male' ? 'Male' : 'Female'}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               ))}
             </View>
@@ -210,7 +212,7 @@ export default function BodyMeasurementsScreen() {
         </View>
 
         {/* Optional Measurements */}
-        <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Optional</Text>
+        <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Optional</AppText>
         <View
           style={[
             styles.card,
@@ -232,7 +234,7 @@ export default function BodyMeasurementsScreen() {
         {/* Analysis */}
         {calculations && (
           <>
-            <Text style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Analysis</Text>
+            <AppText weight="semibold" style={[styles.sectionTitle, { color: Colors.textSecondary }]}>Analysis</AppText>
             <View
               style={[
                 styles.card,
@@ -244,9 +246,9 @@ export default function BodyMeasurementsScreen() {
               ]}>
               {/* BMI Row */}
               <View style={styles.calcRow}>
-                <Text style={[styles.calcLabel, { color: Colors.textSecondary }]}>Your BMI</Text>
+                <AppText weight="medium" style={[styles.calcLabel, { color: Colors.textSecondary }]}>Your BMI</AppText>
                 <View style={styles.calcValueBox}>
-                  <Text style={[styles.calcValue, { color: Colors.text }]}>{calculations.bmi}</Text>
+                  <AppText weight="bold" style={[styles.calcValue, { color: Colors.text }]}>{calculations.bmi}</AppText>
                   <View
                     style={[
                       styles.statusDot,
@@ -258,16 +260,16 @@ export default function BodyMeasurementsScreen() {
 
               {/* Recommended Weight */}
               <View style={[styles.calcRow, { marginTop: spacing.md }]}>
-                <Text style={[styles.calcLabel, { color: Colors.textSecondary }]}>
+                <AppText weight="medium" style={[styles.calcLabel, { color: Colors.textSecondary }]}>
                   Recommended Weight
-                </Text>
-                <Text style={[styles.calcValue, { color: Colors.primary }]}>
+                </AppText>
+                <AppText weight="bold" style={[styles.calcValue, { color: Colors.primary }]}>
                   {calculations.recommendedWeight} kg
-                </Text>
+                </AppText>
               </View>
-              <Text style={[styles.calcSubtext, { color: Colors.textSecondary }]}>
+              <AppText style={[styles.calcSubtext, { color: Colors.textSecondary }]}>
                 Healthy range: {calculations.minHealthy} - {calculations.maxHealthy} kg
-              </Text>
+              </AppText>
 
               {/* Suggestion Card */}
               <View
@@ -287,13 +289,13 @@ export default function BodyMeasurementsScreen() {
                       color={calculations.statusColor}
                     />
                   </View>
-                  <Text style={[styles.suggestionTitle, { color: Colors.text }]}>
+                  <AppText weight="bold" style={[styles.suggestionTitle, { color: Colors.text }]}>
                     {calculations.suggestionTitle}
-                  </Text>
+                  </AppText>
                 </View>
-                <Text style={[styles.suggestionText, { color: Colors.textSecondary }]}>
+                <AppText style={[styles.suggestionText, { color: Colors.textSecondary }]}>
                   {calculations.suggestion}
-                </Text>
+                </AppText>
               </View>
             </View>
           </>
@@ -310,9 +312,9 @@ export default function BodyMeasurementsScreen() {
             style={[styles.saveButton, { backgroundColor: Colors.primary }]}
             onPress={saveMeasurements}
             activeOpacity={activeOpacity.button}>
-            <Text style={[styles.saveButtonText, { color: Colors.background }]}>
+            <AppText weight="bold" style={[styles.saveButtonText, { color: Colors.background }]}>
               Save Measurements
-            </Text>
+            </AppText>
           </TouchableOpacity>
         </View>
       )}
@@ -345,18 +347,15 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: typography.lg,
-    fontWeight: '500',
     marginLeft: -spacing.xs,
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.xl,
@@ -388,7 +387,6 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: typography.lg,
-    fontWeight: '500',
   },
   inputGroup: {
     flexDirection: 'row',
@@ -421,7 +419,6 @@ const styles = StyleSheet.create({
   },
   genderChipText: {
     fontSize: typography.base,
-    fontWeight: '600',
   },
   calcRow: {
     flexDirection: 'row',
@@ -432,7 +429,6 @@ const styles = StyleSheet.create({
   },
   calcLabel: {
     fontSize: typography.base,
-    fontWeight: '500',
   },
   calcValueBox: {
     flexDirection: 'row',
@@ -441,7 +437,6 @@ const styles = StyleSheet.create({
   },
   calcValue: {
     fontSize: typography.xl,
-    fontWeight: 'bold',
   },
   statusDot: {
     width: 10,
@@ -476,7 +471,6 @@ const styles = StyleSheet.create({
   },
   suggestionTitle: {
     fontSize: typography.lg,
-    fontWeight: '700',
   },
   suggestionText: {
     fontSize: typography.base,
@@ -500,6 +494,5 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
 });
