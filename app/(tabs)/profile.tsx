@@ -12,7 +12,6 @@
 import React, { useRef, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -28,11 +27,12 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { WorkoutsPerWeekWidget } from '@/components/WorkoutsPerWeekWidget';
+import { NeonCard } from '@/components/NeonCard';
+import { AppText } from '@/components/ui/AppText';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { getTierColor, getTierProgress, getNextTier } from '@/constants/ranks';
 import { RankIcon } from '@/components/RankIcon';
-import { GlassCard } from '@/components/GlassCard';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 
 
@@ -138,9 +138,9 @@ export default function ProfileScreen() {
           styles.center,
           { backgroundColor: Colors.background },
         ]}>
-        <Text style={[styles.loadingText, { color: Colors.textSecondary }]}>
+        <AppText style={[styles.loadingText, { color: Colors.textSecondary }]}>
           Loading...
-        </Text>
+        </AppText>
       </View>
     );
   }
@@ -153,8 +153,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]
-      }
+      style={[styles.safeArea, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]}
       edges={['top']}>
       <ScrollView
         style={styles.container}
@@ -197,21 +196,20 @@ export default function ProfileScreen() {
 
         {/* Personal Goal */}
         {user.personalGoal ? (
-          <GlassCard
-            intensity={35}
+          <NeonCard
             borderRadius={radius.lg}
             style={styles.goalCard}
             contentStyle={styles.goalCardContent}>
             <MaterialIcons name="flag" size={16} color={Colors.secondary} />
-            <Text
+            <AppText
               style={[styles.goalText, { color: Colors.textSecondary }]}
               numberOfLines={2}>
               {user.personalGoal}
-            </Text>
-          </GlassCard>
+            </AppText>
+          </NeonCard>
         ) : null}
 
-        {/* Stats Grid - 2x2 layout (Glassmorphism) */}
+        {/* Stats Grid - 2x2 layout */}
         <View style={styles.statsGrid}>
           <StatCard
             label="Level"
@@ -221,14 +219,13 @@ export default function ProfileScreen() {
             progress={xpProgress}
             color={Colors.primary}
             Colors={Colors}
-            glass
+            highlight
           />
           <StatCard
             label="Workouts"
             value={user.totalWorkouts.toString()}
             subtext="completed"
             Colors={Colors}
-            glass
           />
           <StatCard
             label="Streak"
@@ -236,22 +233,20 @@ export default function ProfileScreen() {
             subtext="weeks"
             highlight
             Colors={Colors}
-            glass
           />
           <StatCard
             label="Hours"
             value={user.totalHours.toString()}
             subtext="total"
             Colors={Colors}
-            glass
           />
         </View>
 
         {/* Dashboard Section */}
         <View style={styles.dashboardHeader}>
-          <Text style={[styles.dashboardTitle, { color: Colors.text }]}>
+          <AppText weight="bold" style={[styles.dashboardTitle, { color: Colors.text }]}>
             Dashboard
-          </Text>
+          </AppText>
           <TouchableOpacity
             style={[
               styles.addWidgetButton,
@@ -261,32 +256,32 @@ export default function ProfileScreen() {
               },
             ]}
             activeOpacity={activeOpacity.button}>
-            <Text style={[styles.addWidgetText, { color: Colors.secondary }]}>
+            <AppText weight="semibold" style={[styles.addWidgetText, { color: Colors.secondary }]}>
               + Widget
-            </Text>
+            </AppText>
           </TouchableOpacity>
         </View>
 
         {/* Workouts Per Week Widget */}
         <WorkoutsPerWeekWidget />
 
-        {/* ── Fitness Score Section (Glassmorphism) ── */}
-        <GlassCard
-          intensity={50}
+        {/* ── Fitness Score Section ── */}
+        <NeonCard
           borderRadius={radius.xl}
+          glowColor={rankColor}
           onPress={() => router.push('/rank-details')}
           activeOpacity={activeOpacity.card}
           style={styles.rankSection}
           contentStyle={styles.rankSectionContent}>
           <View style={styles.fitnessHeader}>
             <View>
-              <Text style={[styles.sectionTitle, { color: Colors.text }]}>
+              <AppText weight="bold" style={[styles.sectionTitle, { color: Colors.text }]}>
                 Fitness Score
-              </Text>
-              <Text
+              </AppText>
+              <AppText
                 style={[styles.rankSubtext, { color: Colors.textSecondary }]}>
                 {user.fitnessScore} / 100 · {user.rank}
-              </Text>
+              </AppText>
             </View>
             <View
               style={[
@@ -294,9 +289,9 @@ export default function ProfileScreen() {
                 { backgroundColor: rankColor + '1A' },
               ]}>
               <RankIcon rank={user.rank} size={22} glow glowColor={rankColor} glowIntensity="medium" />
-              <Text style={[styles.rankBadgeText, { color: rankColor }]}>
+              <AppText weight="bold" style={[styles.rankBadgeText, { color: rankColor }]}>
                 {user.rank}
-              </Text>
+              </AppText>
             </View>
           </View>
 
@@ -316,13 +311,14 @@ export default function ProfileScreen() {
 
           {/* Progress percentage label */}
           <View style={styles.progressLabelRow}>
-            <Text
+            <AppText
+              weight="medium"
               style={[
                 styles.progressLabel,
                 { color: Colors.textSecondary },
               ]}>
               {progressPercent}% to {nextTier ?? 'Max Rank'}
-            </Text>
+            </AppText>
           </View>
 
           {/* 4 Breakdown Bars — animated */}
@@ -347,7 +343,7 @@ export default function ProfileScreen() {
               label="Progression"
               value={user.fitnessBreakdown.progression}
               weight={20}
-              color={Colors.gold}
+              color={Colors.primary}
               Colors={Colors}
               animatedWidth={progressionAnim}
             />
@@ -355,23 +351,23 @@ export default function ProfileScreen() {
               label="Variety"
               value={user.fitnessBreakdown.variety}
               weight={10}
-              color={Colors.bronze}
+              color={Colors.secondary}
               Colors={Colors}
               animatedWidth={varietyAnim}
             />
           </View>
 
           <View style={styles.tapHintRow}>
-            <MaterialIcons
-              name="chevron-right"
+            <IconSymbol
+              name="chevron.right"
               size={16}
               color={Colors.textSecondary}
             />
-            <Text style={[styles.tapHint, { color: Colors.textSecondary }]}>
+            <AppText weight="medium" style={[styles.tapHint, { color: Colors.textSecondary }]}>
               View Rank Details
-            </Text>
+            </AppText>
           </View>
-        </GlassCard>
+        </NeonCard>
       </ScrollView>
     </SafeAreaView>
   );
@@ -387,7 +383,6 @@ function StatCard({
   color,
   highlight,
   Colors,
-  glass,
 }: {
   label: string;
   value: string;
@@ -397,20 +392,24 @@ function StatCard({
   color?: string;
   highlight?: boolean;
   Colors: ReturnType<typeof useTheme>;
-  glass?: boolean;
 }) {
-  const content = (
-    <>
-      <Text style={[styles.statLabel, { color: Colors.textSecondary }]}>
+  return (
+    <NeonCard
+      borderRadius={radius.lg}
+      glowColor={highlight ? Colors.primary : undefined}
+      style={styles.statCard}
+      contentStyle={styles.statCardContent}>
+      <AppText weight="semibold" style={[styles.statLabel, { color: Colors.textSecondary }]}>
         {label}
-      </Text>
-      <Text
+      </AppText>
+      <AppText
+        weight="bold"
         style={[
           styles.statValue,
           { color: highlight ? Colors.primary : Colors.text },
         ]}>
         {value}
-      </Text>
+      </AppText>
       {showProgress && progress !== undefined && (
         <View style={styles.miniProgressContainer}>
           <View
@@ -430,39 +429,10 @@ function StatCard({
           </View>
         </View>
       )}
-      <Text style={[styles.statSubtext, { color: Colors.textSecondary }]}>
+      <AppText style={[styles.statSubtext, { color: Colors.textSecondary }]}>
         {subtext}
-      </Text>
-    </>
-  );
-
-  if (glass) {
-    return (
-      <GlassCard
-        intensity={35}
-        borderRadius={radius.lg}
-        borderColor={highlight ? Colors.primary : undefined}
-        borderWidth={highlight ? 1.5 : 1}
-        style={styles.statCard}
-        contentStyle={styles.statCardContent}>
-        {content}
-      </GlassCard>
-    );
-  }
-
-  return (
-    <View
-      style={[
-        styles.statCard,
-        {
-          backgroundColor: Colors.card,
-          borderColor: highlight ? Colors.primary : Colors.border,
-          shadowColor: Colors.shadow,
-        },
-        highlight && { borderWidth: 1.5 },
-      ]}>
-      {content}
-    </View>
+      </AppText>
+    </NeonCard>
   );
 }
 
@@ -490,14 +460,15 @@ function BreakdownBar({
   return (
     <View style={styles.breakdownRow}>
       <View style={styles.breakdownLabelRow}>
-        <Text
+        <AppText
+          weight="semibold"
           style={[styles.breakdownLabel, { color: Colors.textSecondary }]}>
           {label}
-        </Text>
-        <Text
+        </AppText>
+        <AppText
           style={[styles.breakdownWeight, { color: Colors.textSecondary }]}>
           {weight}%
-        </Text>
+        </AppText>
       </View>
       <View
         style={[
@@ -508,9 +479,9 @@ function BreakdownBar({
           style={[styles.breakdownFill, { width, backgroundColor: color }]}
         />
       </View>
-      <Text style={[styles.breakdownValue, { color }]}>
+      <AppText weight="bold" style={[styles.breakdownValue, { color }]}>
         {Math.round(value)}
-      </Text>
+      </AppText>
     </View>
   );
 }
@@ -592,7 +563,6 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: typography['2xl'],
-    fontWeight: 'bold',
   },
   miniProgressContainer: {
     marginVertical: spacing.sm,
@@ -618,7 +588,6 @@ const styles = StyleSheet.create({
   },
   dashboardTitle: {
     fontSize: typography.xl,
-    fontWeight: 'bold',
   },
   addWidgetButton: {
     paddingHorizontal: spacing.md,
@@ -628,7 +597,6 @@ const styles = StyleSheet.create({
   },
   addWidgetText: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   rankSection: {
     marginTop: 'auto',
@@ -640,7 +608,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
     marginBottom: spacing.xs,
   },
   rankSubtext: {
@@ -665,7 +632,6 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: typography.xs,
-    fontWeight: '500',
   },
   goalCard: {
     marginTop: spacing.md,
@@ -697,14 +663,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     gap: spacing.sm,
   },
-  rankDotLarge: {
-    width: 10,
-    height: 10,
-    borderRadius: radius.full,
-  },
   rankBadgeText: {
     fontSize: typography.sm,
-    fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -722,7 +682,6 @@ const styles = StyleSheet.create({
   },
   breakdownLabel: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   breakdownWeight: {
     fontSize: typography.xs,
@@ -738,7 +697,6 @@ const styles = StyleSheet.create({
   },
   breakdownValue: {
     fontSize: typography.sm,
-    fontWeight: 'bold',
     textAlign: 'right',
   },
   tapHintRow: {
@@ -750,6 +708,5 @@ const styles = StyleSheet.create({
   },
   tapHint: {
     fontSize: typography.sm,
-    fontWeight: '500',
   },
 });

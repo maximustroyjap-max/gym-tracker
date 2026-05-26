@@ -33,6 +33,7 @@ const MAPPING = {
   'checkmark.circle.fill': 'check-circle',
   'settings': 'settings',
   'arrow.up.arrow.down': 'swap-vert',
+  'flag': 'flag',
 } as IconMapping;
 
 /**

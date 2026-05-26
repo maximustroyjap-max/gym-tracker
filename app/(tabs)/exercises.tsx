@@ -7,7 +7,6 @@
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
@@ -34,6 +33,7 @@ import {
   Category,
 } from '@/constants/exercises';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { AppText } from '@/components/ui/AppText';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 
 interface ExerciseSection {
@@ -168,9 +168,9 @@ export default function ExercisesScreen() {
   const renderSectionHeader = useCallback(
     ({ section }: { section: ExerciseSection }) => (
       <View style={[styles.sectionHeader, { borderBottomColor: Colors.border }]}>
-        <Text style={[styles.sectionHeaderText, { color: Colors.textSecondary }]}>
+        <AppText weight="bold" style={[styles.sectionHeaderText, { color: Colors.textSecondary }]}>
           {section.title}
-        </Text>
+        </AppText>
       </View>
     ),
     [Colors]
@@ -180,7 +180,7 @@ export default function ExercisesScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Exercises</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Exercises</AppText>
         <TouchableOpacity
           style={[
             styles.newButton,
@@ -188,7 +188,7 @@ export default function ExercisesScreen() {
           ]}
           onPress={() => setShowCreateExercise(true)}
           activeOpacity={activeOpacity.card}>
-          <Text style={[styles.newButtonText, { color: Colors.textSecondary }]}>NEW</Text>
+          <AppText weight="semibold" style={[styles.newButtonText, { color: Colors.textSecondary }]}>NEW</AppText>
         </TouchableOpacity>
       </View>
 
@@ -224,13 +224,14 @@ export default function ExercisesScreen() {
           ]}
           onPress={() => setShowBodyPartPicker(true)}
           activeOpacity={activeOpacity.card}>
-          <Text
+          <AppText
+            weight="semibold"
             style={[
               styles.filterButtonText,
               { color: selectedBodyPart ? Colors.primary : Colors.text },
             ]}>
             {selectedBodyPart ?? 'Any Body Part'}
-          </Text>
+          </AppText>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -243,13 +244,14 @@ export default function ExercisesScreen() {
           ]}
           onPress={() => setShowCategoryPicker(true)}
           activeOpacity={activeOpacity.card}>
-          <Text
+          <AppText
+            weight="semibold"
             style={[
               styles.filterButtonText,
               { color: selectedCategory ? Colors.primary : Colors.text },
             ]}>
             {selectedCategory ?? 'Any Category'}
-          </Text>
+          </AppText>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -277,9 +279,9 @@ export default function ExercisesScreen() {
         pointerEvents={selectedExercise ? 'none' : 'auto'}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyStateText, { color: Colors.textSecondary }]}>
+            <AppText style={[styles.emptyStateText, { color: Colors.textSecondary }]}>
               No exercises found
-            </Text>
+            </AppText>
             <TouchableOpacity
               style={[
                 styles.clearFiltersButton,
@@ -287,9 +289,9 @@ export default function ExercisesScreen() {
               ]}
               onPress={clearFilters}
               activeOpacity={activeOpacity.card}>
-              <Text style={[styles.clearFiltersText, { color: Colors.primary }]}>
+              <AppText weight="semibold" style={[styles.clearFiltersText, { color: Colors.primary }]}>
                 Clear all filters
-              </Text>
+              </AppText>
             </TouchableOpacity>
           </View>
         }
@@ -518,12 +520,12 @@ function SwipeableExerciseRow({
           activeOpacity={1}>
           <Animated.View style={[styles.exerciseRowContent, { transform: [{ scale: pressScale }] }]}>
             <View style={styles.exerciseInfo}>
-              <Text style={[styles.exerciseName, { color: Colors.text }]}>
+              <AppText weight="semibold" style={[styles.exerciseName, { color: Colors.text }]}>
                 {exercise.name}
-              </Text>
-              <Text style={[styles.exerciseMeta, { color: Colors.textSecondary }]}>
+              </AppText>
+              <AppText style={[styles.exerciseMeta, { color: Colors.textSecondary }]}>
                 {exercise.bodyPart}
-              </Text>
+              </AppText>
             </View>
             <IconSymbol name="chevron.right" size={16} color={Colors.textSecondary + '60'} />
           </Animated.View>
@@ -568,7 +570,7 @@ function FilterPickerModal<T extends string>({
             styles.modalContent,
             { backgroundColor: Colors.card, shadowColor: Colors.shadow },
           ]}>
-          <Text style={[styles.modalTitle, { color: Colors.text }]}>{title}</Text>
+          <AppText weight="bold" style={[styles.modalTitle, { color: Colors.text }]}>{title}</AppText>
 
           {/* Clear option */}
           <TouchableOpacity
@@ -578,14 +580,14 @@ function FilterPickerModal<T extends string>({
             ]}
             onPress={() => handleSelect(null)}
             activeOpacity={activeOpacity.row}>
-            <Text
+            <AppText
+              weight={selected === null ? 'bold' : 'medium'}
               style={[
                 styles.modalOptionText,
                 { color: selected === null ? Colors.primary : Colors.text },
-                selected === null && { fontWeight: '700' },
               ]}>
               {clearLabel}
-            </Text>
+            </AppText>
             {selected === null && (
               <IconSymbol name="checkmark" size={18} color={Colors.primary} />
             )}
@@ -601,14 +603,14 @@ function FilterPickerModal<T extends string>({
               ]}
               onPress={() => handleSelect(option)}
               activeOpacity={activeOpacity.row}>
-              <Text
+              <AppText
+                weight={selected === option ? 'bold' : 'medium'}
                 style={[
                   styles.modalOptionText,
                   { color: selected === option ? Colors.primary : Colors.text },
-                  selected === option && { fontWeight: '700' },
                 ]}>
                 {option}
-              </Text>
+              </AppText>
               {selected === option && (
                 <IconSymbol name="checkmark" size={18} color={Colors.primary} />
               )}
@@ -634,7 +636,6 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
   },
   newButton: {
     paddingVertical: spacing.sm,
@@ -644,7 +645,6 @@ const styles = StyleSheet.create({
   },
   newButtonText: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   searchContainer: {
     paddingHorizontal: spacing.lg,
@@ -684,7 +684,6 @@ const styles = StyleSheet.create({
   },
   filterButtonText: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   sortButton: {
     width: 48,
@@ -705,7 +704,6 @@ const styles = StyleSheet.create({
   },
   sectionHeaderText: {
     fontSize: typography.xl,
-    fontWeight: 'bold',
   },
   swipeContainer: {
     position: 'relative',
@@ -747,7 +745,6 @@ const styles = StyleSheet.create({
   },
   exerciseName: {
     fontSize: typography.lg,
-    fontWeight: '600',
     marginBottom: 2,
   },
   exerciseMeta: {
@@ -770,7 +767,6 @@ const styles = StyleSheet.create({
   },
   clearFiltersText: {
     fontSize: typography.base,
-    fontWeight: '600',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -797,7 +793,6 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: spacing.md,
     paddingHorizontal: spacing.lg,
@@ -812,6 +807,5 @@ const styles = StyleSheet.create({
   },
   modalOptionText: {
     fontSize: typography.lg,
-    fontWeight: '500',
   },
 });

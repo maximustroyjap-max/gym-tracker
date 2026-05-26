@@ -14,7 +14,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -31,6 +30,7 @@ import { useWorkout } from '@/context/WorkoutContext';
 import { EXAMPLE_TEMPLATES } from '@/constants/templates';
 import { WorkoutTemplate, TemplateFolder } from '@/types/user';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { AppText } from '@/components/ui/AppText';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 import { TemplateBuilder } from '@/components/TemplateBuilder';
 import { CreateFolderModal } from '@/components/CreateFolderModal';
@@ -241,10 +241,10 @@ export default function WorkoutScreen() {
         scrollEnabled={!liftedTemplate && !anyOverlayOpen}
         pointerEvents={anyOverlayOpen ? 'none' : 'auto'}>
         {/* Page Title */}
-        <Text style={[styles.pageTitle, { color: Colors.text }]}>Start Workout</Text>
+        <AppText weight="bold" style={[styles.pageTitle, { color: Colors.text }]}>Start Workout</AppText>
 
         {/* Quick Start Section */}
-        <Text style={[styles.sectionLabel, { color: Colors.text }]}>Quick Start</Text>
+        <AppText weight="bold" style={[styles.sectionLabel, { color: Colors.text }]}>Quick Start</AppText>
         <TouchableOpacity
           style={[styles.emptyWorkoutButton, { backgroundColor: Colors.secondary }]}
           onPress={() => {
@@ -252,14 +252,14 @@ export default function WorkoutScreen() {
             startWorkout();
           }}
           activeOpacity={activeOpacity.button}>
-          <Text style={[styles.emptyWorkoutText, { color: Colors.background }]}>
+          <AppText weight="bold" style={[styles.emptyWorkoutText, { color: Colors.background }]}>
             Start an Empty Workout
-          </Text>
+          </AppText>
         </TouchableOpacity>
 
         {/* Templates Header */}
         <View style={styles.templatesHeader}>
-          <Text style={[styles.templatesTitle, { color: Colors.text }]}>Templates</Text>
+          <AppText weight="bold" style={[styles.templatesTitle, { color: Colors.text }]}>Templates</AppText>
           <View style={styles.templatesHeaderActions}>
             {/* + Template button */}
             <TouchableOpacity
@@ -272,7 +272,7 @@ export default function WorkoutScreen() {
                 setShowTemplateBuilder(true);
               }}
               activeOpacity={activeOpacity.button}>
-              <Text style={[styles.addTemplateText, { color: Colors.secondary }]}>+ Template</Text>
+              <AppText weight="semibold" style={[styles.addTemplateText, { color: Colors.secondary }]}>+ Template</AppText>
             </TouchableOpacity>
             {/* Folder icon */}
             <TouchableOpacity
@@ -302,7 +302,7 @@ export default function WorkoutScreen() {
         {/* Folders Section */}
         {templateFolders.length > 0 && (
           <>
-            <Text style={[styles.subSectionLabel, { color: Colors.textSecondary }]}>FOLDERS</Text>
+            <AppText weight="semibold" style={[styles.subSectionLabel, { color: Colors.textSecondary }]}>FOLDERS</AppText>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -335,12 +335,12 @@ export default function WorkoutScreen() {
                   {/* Folder content */}
                   <View pointerEvents="none" style={styles.folderCardContent}>
                     <IconSymbol name="folder" size={24} color={Colors.primary} />
-                    <Text style={[styles.folderName, { color: Colors.text }]} numberOfLines={1}>
+                    <AppText weight="semibold" style={[styles.folderName, { color: Colors.text }]} numberOfLines={1}>
                       {folder.name}
-                    </Text>
-                    <Text style={[styles.folderCount, { color: Colors.textSecondary }]}>
+                    </AppText>
+                    <AppText style={[styles.folderCount, { color: Colors.textSecondary }]}>
                       {folder.templateIds.length} template{folder.templateIds.length !== 1 ? 's' : ''}
-                    </Text>
+                    </AppText>
                   </View>
 
                   {/* Menu button */}
@@ -366,9 +366,9 @@ export default function WorkoutScreen() {
         {expandedFolderId && !liftedTemplate && (
           <>
             <View style={styles.subSectionHeader}>
-              <Text style={[styles.subSectionTitle, { color: Colors.text }]}>
+              <AppText weight="bold" style={[styles.subSectionTitle, { color: Colors.text }]}>
                 {templateFolders.find((f) => f.id === expandedFolderId)?.name}
-              </Text>
+              </AppText>
             </View>
             <View style={styles.cardGrid}>
               {getTemplatesInFolder(expandedFolderId).map((template) => (
@@ -387,9 +387,9 @@ export default function WorkoutScreen() {
 
         {/* My Templates Section */}
         <View style={styles.subSectionHeader}>
-          <Text style={[styles.subSectionTitle, { color: Colors.text }]}>
+          <AppText weight="bold" style={[styles.subSectionTitle, { color: Colors.text }]}>
             My Templates ({unfiledTemplates.length})
-          </Text>
+          </AppText>
           {!liftedTemplate && (
             <TouchableOpacity
               style={[styles.iconButton, { backgroundColor: Colors.border + '80' }]}
@@ -401,14 +401,14 @@ export default function WorkoutScreen() {
 
         {liftedTemplate && (
           <View style={styles.liftHint}>
-            <Text style={[styles.liftHintText, { color: Colors.primary }]}>
+            <AppText weight="semibold" style={[styles.liftHintText, { color: Colors.primary }]}>
               Tap a folder to move &quot;{liftedTemplate.name}&quot;
-            </Text>
+            </AppText>
             <TouchableOpacity
               onPress={handleCancelLift}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={activeOpacity.button}>
-              <Text style={[styles.liftHintCancel, { color: Colors.danger }]}>Cancel</Text>
+              <AppText weight="semibold" style={[styles.liftHintCancel, { color: Colors.danger }]}>Cancel</AppText>
             </TouchableOpacity>
           </View>
         )}
@@ -443,9 +443,9 @@ export default function WorkoutScreen() {
 
         {/* Example Templates Section */}
         <View style={styles.subSectionHeader}>
-          <Text style={[styles.subSectionTitle, { color: Colors.text }]}>
+          <AppText weight="bold" style={[styles.subSectionTitle, { color: Colors.text }]}>
             Example Templates ({EXAMPLE_TEMPLATES.length})
-          </Text>
+          </AppText>
         </View>
 
         <View style={[styles.cardGrid, { marginTop: 'auto' }]}>
@@ -587,9 +587,9 @@ function TemplateCard({
       activeOpacity={activeOpacity.card}>
       {/* Card Header: Name + Menu */}
       <View style={styles.cardHeader}>
-        <Text style={[styles.cardTitle, { color: Colors.text }]} numberOfLines={2}>
+        <AppText weight="bold" style={[styles.cardTitle, { color: Colors.text }]} numberOfLines={2}>
           {template.name}
-        </Text>
+        </AppText>
         {!isLifted && (
           <TouchableOpacity
             style={[styles.cardMenuButton, { backgroundColor: Colors.border + '80' }]}
@@ -602,9 +602,9 @@ function TemplateCard({
       </View>
 
       {/* Exercise List */}
-      <Text style={[styles.cardExercises, { color: Colors.textSecondary }]} numberOfLines={4}>
+      <AppText style={[styles.cardExercises, { color: Colors.textSecondary }]} numberOfLines={4}>
         {displayText}
-      </Text>
+      </AppText>
     </TouchableOpacity>
   );
 }
@@ -621,13 +621,11 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
     marginTop: spacing.sm,
     marginBottom: spacing.xl,
   },
   sectionLabel: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
     marginBottom: spacing.md,
   },
   emptyWorkoutButton: {
@@ -640,7 +638,6 @@ const styles = StyleSheet.create({
   },
   emptyWorkoutText: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
   templatesHeader: {
     flexDirection: 'row',
@@ -650,7 +647,6 @@ const styles = StyleSheet.create({
   },
   templatesTitle: {
     fontSize: typography['2xl'],
-    fontWeight: 'bold',
   },
   templatesHeaderActions: {
     flexDirection: 'row',
@@ -665,7 +661,6 @@ const styles = StyleSheet.create({
   },
   addTemplateText: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   iconButton: {
     width: touch.iconContainer,
@@ -676,7 +671,6 @@ const styles = StyleSheet.create({
   },
   subSectionLabel: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.md,
@@ -691,7 +685,6 @@ const styles = StyleSheet.create({
   },
   subSectionTitle: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
   foldersRow: {
     paddingRight: spacing.lg,
@@ -713,7 +706,6 @@ const styles = StyleSheet.create({
   },
   folderName: {
     fontSize: typography.sm,
-    fontWeight: '600',
     marginTop: spacing.sm,
     textAlign: 'center',
   },
@@ -764,7 +756,6 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
     flex: 1,
     lineHeight: 22,
   },
@@ -789,12 +780,10 @@ const styles = StyleSheet.create({
   },
   liftHintText: {
     fontSize: typography.sm,
-    fontWeight: '600',
     flex: 1,
   },
   liftHintCancel: {
     fontSize: typography.sm,
-    fontWeight: '600',
     marginLeft: spacing.md,
   },
 });

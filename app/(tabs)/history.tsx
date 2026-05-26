@@ -8,7 +8,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
   ScrollView,
@@ -22,6 +21,8 @@ import { TAB_BAR_TOTAL_HEIGHT } from '@/components/CurvedTabBar';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { NeonCard } from '@/components/NeonCard';
+import { AppText } from '@/components/ui/AppText';
 import { WorkoutHistoryEntry, HistoryExercise } from '@/types/user';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 
@@ -162,7 +163,7 @@ function CalendarModal({ visible, onClose, workoutHistory, Colors }: CalendarMod
               activeOpacity={activeOpacity.button}>
               <IconSymbol name="xmark" size={20} color={Colors.text} />
             </TouchableOpacity>
-            <Text style={[styles.modalTitle, { color: Colors.text }]}>Calendar</Text>
+            <AppText weight="bold" style={[styles.modalTitle, { color: Colors.text }]}>Calendar</AppText>
             <View style={styles.headerSpacer} />
           </View>
 
@@ -214,21 +215,22 @@ function MonthGrid({
 
   return (
     <View style={styles.monthContainer} onLayout={(e) => onLayout?.(e.nativeEvent.layout.y)}>
-      <Text style={[styles.monthTitle, { color: Colors.text }]}>
+      <AppText weight="bold" style={[styles.monthTitle, { color: Colors.text }]}>
         {MONTH_NAMES[month]} {year}
-      </Text>
+      </AppText>
 
       {/* Day of week headers */}
       <View style={[styles.dayHeaderRow, { gap: DAY_GAP }]}>
         {DAY_HEADERS.map((day, i) => (
-          <Text
+          <AppText
+            weight="semibold"
             key={i}
             style={[
               styles.dayHeaderText,
               { color: Colors.textSecondary, width: dayCellSize },
             ]}>
             {day}
-          </Text>
+          </AppText>
         ))}
       </View>
 
@@ -252,9 +254,9 @@ function MonthGrid({
                     styles.workoutDayCircle,
                     { backgroundColor: Colors.primary, width: dayCellSize, height: dayCellSize, borderRadius: dayCellSize / 2 },
                   ]}>
-                  <Text style={[styles.workoutDayText, { color: Colors.background }]}>
+                  <AppText weight="bold" style={[styles.workoutDayText, { color: Colors.background }]}>
                     {dayNumber}
-                  </Text>
+                  </AppText>
                   <View style={[styles.workoutDot, { backgroundColor: Colors.background }]}>
                     <IconSymbol name="checkmark" size={8} color={Colors.primary} />
                   </View>
@@ -265,14 +267,14 @@ function MonthGrid({
                     styles.todayCircle,
                     { borderColor: Colors.text, width: dayCellSize, height: dayCellSize, borderRadius: dayCellSize / 2 },
                   ]}>
-                  <Text style={[styles.todayText, { color: Colors.text }]}>
+                  <AppText weight="bold" style={[styles.todayText, { color: Colors.text }]}>
                     {dayNumber}
-                  </Text>
+                  </AppText>
                 </View>
               ) : (
-                <Text style={[styles.dayText, { color: Colors.textSecondary }]}>
+                <AppText weight="medium" style={[styles.dayText, { color: Colors.textSecondary }]}>
                   {dayNumber}
-                </Text>
+                </AppText>
               )}
             </View>
           );
@@ -291,7 +293,7 @@ export default function HistoryScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, styles.center]} edges={['top']}>
-        <Text style={[styles.loadingText, { color: Colors.textSecondary }]}>Loading...</Text>
+        <AppText style={[styles.loadingText, { color: Colors.textSecondary }]}>Loading...</AppText>
       </SafeAreaView>
     );
   }
@@ -302,7 +304,7 @@ export default function HistoryScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: Platform.OS === 'web' ? Colors.background : 'transparent' }]} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.title, { color: Colors.text }]}>History</Text>
+        <AppText weight="bold" style={[styles.title, { color: Colors.text }]}>History</AppText>
         <TouchableOpacity
           style={[
             styles.calendarButton,
@@ -311,9 +313,9 @@ export default function HistoryScreen() {
           onPress={() => setShowCalendar(true)}
           activeOpacity={activeOpacity.button}>
           <IconSymbol name="calendar" size={18} color={Colors.textSecondary} />
-          <Text style={[styles.calendarButtonText, { color: Colors.textSecondary }]}>
+          <AppText weight="semibold" style={[styles.calendarButtonText, { color: Colors.textSecondary }]}>
             Calendar
-          </Text>
+          </AppText>
         </TouchableOpacity>
       </View>
 
@@ -326,10 +328,10 @@ export default function HistoryScreen() {
             ]}>
             <IconSymbol name="clock.fill" size={40} color={Colors.textSecondary} />
           </View>
-          <Text style={[styles.emptyTitle, { color: Colors.text }]}>No Workouts Yet</Text>
-          <Text style={[styles.emptySubtitle, { color: Colors.textSecondary }]}>
+          <AppText weight="bold" style={[styles.emptyTitle, { color: Colors.text }]}>No Workouts Yet</AppText>
+          <AppText style={[styles.emptySubtitle, { color: Colors.textSecondary }]}>
             Complete your first workout and it will appear here.
-          </Text>
+          </AppText>
         </View>
       ) : (
         <FlatList
@@ -360,22 +362,14 @@ function HistoryCard({
   Colors: ReturnType<typeof useTheme>;
 }) {
   return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: Colors.card,
-          borderColor: Colors.border,
-          shadowColor: Colors.shadow,
-        },
-      ]}>
+    <NeonCard borderRadius={radius.xl} contentStyle={styles.cardContent}>
       {/* Card Header: Date + PR badge */}
       <View style={styles.cardHeader}>
         <View>
-          <Text style={[styles.weekday, { color: Colors.textSecondary }]}>
+          <AppText weight="semibold" style={[styles.weekday, { color: Colors.textSecondary }]}>
             {formatWeekday(entry.date)}
-          </Text>
-          <Text style={[styles.date, { color: Colors.text }]}>{formatDate(entry.date)}</Text>
+          </AppText>
+          <AppText weight="bold" style={[styles.date, { color: Colors.text }]}>{formatDate(entry.date)}</AppText>
         </View>
         {entry.prAchieved && (
           <View
@@ -384,19 +378,19 @@ function HistoryCard({
               { backgroundColor: Colors.gold + '15', borderColor: Colors.gold + '44' },
             ]}>
             <IconSymbol name="checkmark" size={12} color={Colors.gold} />
-            <Text style={[styles.prBadgeText, { color: Colors.gold }]}>PR</Text>
+            <AppText weight="bold" style={[styles.prBadgeText, { color: Colors.gold }]}>PR</AppText>
           </View>
         )}
       </View>
 
       {/* Workout Name + Duration */}
       <View style={styles.workoutMeta}>
-        <Text style={[styles.templateName, { color: Colors.text }]}>{entry.templateName}</Text>
+        <AppText weight="semibold" style={[styles.templateName, { color: Colors.text }]}>{entry.templateName}</AppText>
         <View style={[styles.durationBadge, { backgroundColor: Colors.background }]}>
           <IconSymbol name="clock.fill" size={12} color={Colors.textSecondary} />
-          <Text style={[styles.durationText, { color: Colors.textSecondary }]}>
+          <AppText weight="medium" style={[styles.durationText, { color: Colors.textSecondary }]}>
             {formatDuration(entry.duration)}
-          </Text>
+          </AppText>
         </View>
       </View>
 
@@ -423,12 +417,12 @@ function HistoryCard({
             { backgroundColor: Colors.gold + '0D', borderColor: Colors.gold + '33' },
           ]}>
           <IconSymbol name="checkmark" size={14} color={Colors.gold} />
-          <Text style={[styles.prDetailsText, { color: Colors.gold }]} numberOfLines={2}>
+          <AppText weight="semibold" style={[styles.prDetailsText, { color: Colors.gold }]} numberOfLines={2}>
             {entry.prDetails}
-          </Text>
+          </AppText>
         </View>
       )}
-    </View>
+    </NeonCard>
   );
 }
 
@@ -448,16 +442,16 @@ function ExerciseRow({
         !isLast && { borderBottomWidth: 1, borderBottomColor: Colors.border + '44' },
       ]}>
       <View style={styles.exerciseLeft}>
-        <Text style={[styles.exerciseName, { color: Colors.text }]} numberOfLines={1}>
+        <AppText weight="semibold" style={[styles.exerciseName, { color: Colors.text }]} numberOfLines={1}>
           {exercise.exerciseName}
-        </Text>
-        <Text style={[styles.exerciseMeta, { color: Colors.textSecondary }]}>
+        </AppText>
+        <AppText style={[styles.exerciseMeta, { color: Colors.textSecondary }]}>
           {exercise.sets} set{exercise.sets !== 1 ? 's' : ''} · {exercise.bodyPart}
-        </Text>
+        </AppText>
       </View>
       <View style={styles.exerciseRight}>
-        <Text style={[styles.bestSetLabel, { color: Colors.textSecondary }]}>Best</Text>
-        <Text style={[styles.bestSetValue, { color: Colors.primary }]}>{exercise.bestSet}</Text>
+        <AppText weight="semibold" style={[styles.bestSetLabel, { color: Colors.textSecondary }]}>Best</AppText>
+        <AppText weight="bold" style={[styles.bestSetValue, { color: Colors.primary }]}>{exercise.bestSet}</AppText>
       </View>
     </View>
   );
@@ -484,7 +478,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: typography['3xl'],
-    fontWeight: 'bold',
   },
   calendarButton: {
     flexDirection: 'row',
@@ -497,20 +490,13 @@ const styles = StyleSheet.create({
   },
   calendarButtonText: {
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   listContent: {
     paddingHorizontal: spacing.lg,
     gap: spacing.lg,
   },
-  card: {
-    borderRadius: radius.xl,
+  cardContent: {
     padding: spacing.xl,
-    borderWidth: 1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -520,14 +506,12 @@ const styles = StyleSheet.create({
   },
   weekday: {
     fontSize: typography.sm,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 2,
   },
   date: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
   prBadge: {
     flexDirection: 'row',
@@ -540,7 +524,6 @@ const styles = StyleSheet.create({
   },
   prBadgeText: {
     fontSize: typography.xs,
-    fontWeight: 'bold',
   },
   workoutMeta: {
     flexDirection: 'row',
@@ -550,7 +533,6 @@ const styles = StyleSheet.create({
   },
   templateName: {
     fontSize: typography.base,
-    fontWeight: '600',
   },
   durationBadge: {
     flexDirection: 'row',
@@ -562,7 +544,6 @@ const styles = StyleSheet.create({
   },
   durationText: {
     fontSize: typography.sm,
-    fontWeight: '500',
   },
   divider: {
     height: 1,
@@ -583,7 +564,6 @@ const styles = StyleSheet.create({
   },
   exerciseName: {
     fontSize: typography.base,
-    fontWeight: '600',
     marginBottom: 2,
   },
   exerciseMeta: {
@@ -594,14 +574,12 @@ const styles = StyleSheet.create({
   },
   bestSetLabel: {
     fontSize: typography.xs,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 1,
   },
   bestSetValue: {
     fontSize: typography.base,
-    fontWeight: 'bold',
   },
   prDetailsBox: {
     flexDirection: 'row',
@@ -616,7 +594,6 @@ const styles = StyleSheet.create({
   prDetailsText: {
     flex: 1,
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   emptyContainer: {
     flex: 1,
@@ -635,7 +612,6 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: typography.xl,
-    fontWeight: 'bold',
     marginBottom: spacing.sm,
   },
   emptySubtitle: {
@@ -683,7 +659,6 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: typography.lg,
-    fontWeight: 'bold',
   },
   calendarScroll: {
     maxHeight: 480,
@@ -699,7 +674,6 @@ const styles = StyleSheet.create({
   },
   monthTitle: {
     fontSize: typography.xl,
-    fontWeight: 'bold',
     marginBottom: spacing.md,
   },
   dayHeaderRow: {
@@ -710,7 +684,6 @@ const styles = StyleSheet.create({
   dayHeaderText: {
     textAlign: 'center',
     fontSize: typography.sm,
-    fontWeight: '600',
   },
   dayGrid: {
     flexDirection: 'row',
@@ -724,7 +697,6 @@ const styles = StyleSheet.create({
   },
   dayText: {
     fontSize: typography.base,
-    fontWeight: '500',
   },
   workoutDayCircle: {
     justifyContent: 'center',
@@ -733,7 +705,6 @@ const styles = StyleSheet.create({
   },
   workoutDayText: {
     fontSize: typography.base,
-    fontWeight: 'bold',
   },
   workoutDot: {
     position: 'absolute',
@@ -752,6 +723,5 @@ const styles = StyleSheet.create({
   },
   todayText: {
     fontSize: typography.base,
-    fontWeight: 'bold',
   },
 });
