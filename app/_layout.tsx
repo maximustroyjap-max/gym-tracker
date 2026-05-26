@@ -5,6 +5,13 @@
 
 import { useState, useEffect } from 'react';
 import { View, Platform } from 'react-native';
+import {
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_600SemiBold,
+  SpaceGrotesk_700Bold,
+} from '@expo-google-fonts/space-grotesk';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider as NavigationThemeProvider, DefaultTheme } from '@react-navigation/native';
@@ -37,8 +44,15 @@ function AppContent() {
   const isLightTheme = user.theme === 'light';
   const [splashComplete, setSplashComplete] = useState(false);
 
-  // Show splash until animation completes OR auth is still loading
-  const showSplash = !splashComplete || authLoading;
+  const [fontsLoaded] = useFonts({
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_600SemiBold,
+    SpaceGrotesk_700Bold,
+  });
+
+  // Show splash until animation completes OR auth is still loading OR fonts not ready
+  const showSplash = !splashComplete || authLoading || !fontsLoaded;
 
   const content = (
     <>

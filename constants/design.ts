@@ -66,6 +66,14 @@ export const activeOpacity = {
   row: 0.6,
 } as const;
 
+// ─── Font Family ───
+export const fontFamily = {
+  regular:  'SpaceGrotesk_400Regular',
+  medium:   'SpaceGrotesk_500Medium',
+  semibold: 'SpaceGrotesk_600SemiBold',
+  bold:     'SpaceGrotesk_700Bold',
+} as const;
+
 // ─── Shadow Presets ───
 // Returns shadow styles based on theme shadow color
 export function getShadows(shadowColor: string) {
