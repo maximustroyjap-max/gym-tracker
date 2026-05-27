@@ -21,7 +21,7 @@ npx tsc --noEmit            # type check (run after every change)
 - **Auth:** `useAuth()` — `login()`/`signup()` return `{ success, error? }`, always check result
 - **Tab bar padding:** `TAB_BAR_TOTAL_HEIGHT + insets.bottom + spacing.xl` (import from `@/components/CurvedTabBar`)
 - **Tab screen background:** `Platform.OS === 'web' ? Colors.background : 'transparent'`
-- **Platform guards:** wrap `expo-haptics`, `expo-status-bar`, `expo-av` in `Platform.OS !== 'web'`
+- **Platform guards:** wrap `expo-haptics`, `expo-status-bar`, `expo-av`, `expo-notifications`, `expo-keep-awake` in `Platform.OS !== 'web'`
 - **Design tokens:** import from `@/constants/design` (spacing, radius, typography, activeOpacity, animation) — no hardcoded values
 - **Headers:** all hidden globally; every screen needs its own back button
 - **Popups:** render after ScrollView with `StyleSheet.absoluteFill` + high `zIndex`
@@ -54,7 +54,9 @@ User {
   fitnessScore,               // 0-100
   fitnessBreakdown: { consistency, volume, progression, variety },
   rank,                       // "Bronze 1" … "Immortal"
-  currentStreak,              // consecutive weeks meeting weeklyTarget
+  currentStreak,              // consecutive days; grace window = 7 - weeklyTarget days before reset
+  bestStreak,                 // all-time best streak (days)
+  lastWorkoutDate,            // "YYYY-MM-DD" of last finished workout, '' if none
   weeklyTarget, weeklyHistory, workoutHistory,
   myTemplates, customExercises, hiddenExerciseIds,
   bodyMeasurements, notificationSettings, advancedSettings, restTimerSettings,
@@ -62,7 +64,7 @@ User {
 }
 ```
 
-Supabase `profiles` table: scalar columns + JSONB for `fitness_breakdown`, `body_measurements`, `notification_settings`, `advanced_settings`, `rest_timer_settings`, `workout_history`, `custom_exercises`, `templates`, `template_folders`, `weekly_history`. Text array: `hidden_exercise_ids`.
+Supabase `profiles` table: scalar columns (`current_streak`, `best_streak INTEGER DEFAULT 0`, `last_workout_date TEXT DEFAULT ''`, `weekly_target`, `fitness_score`, `rank`, `total_workouts`, `total_hours`, `username`, `avatar`, `theme`) + JSONB for `fitness_breakdown`, `body_measurements`, `notification_settings`, `advanced_settings`, `rest_timer_settings`, `workout_history`, `custom_exercises`, `templates`, `template_folders`, `weekly_history`. Text array: `hidden_exercise_ids`.
 
 ## Navigation
 
@@ -94,7 +96,16 @@ Fitness Score = (Consistency × 0.40) + (Volume × 0.30) + (Progression × 0.20)
 
 Score thresholds: B1=0, B2=5, B3=10, S1=16, S2=23, S3=31, G1=40, G2=50, G3=61, P1=72, P2=82, P3=91, D1=96, D2=98, D3=99, Immortal=100.
 
-Streak = consecutive weeks where `weeklyHistory.count >= weeklyTarget`. Rank can go up **and down**. Recalculates on workout finish and app launch.
+**Streak system (daily with grace window):**
+- `currentStreak` increments by 1 each day a workout is finished (capped at 1 per day)
+- `graceDays = 7 - weeklyTarget` — days of rest allowed before streak resets to 1
+- A gap of `> graceDays + 1` days since `lastWorkoutDate` resets streak to 1
+- Example: `weeklyTarget=4` → 3 grace days → max gap 4 days (Mon→Fri safe; Mon→Sat resets)
+- `checkStreakExpiry` runs at app launch to zero a streak that expired while offline
+- `getDaysUntilStreakDies` drives the warning badge on Home and Profile
+- Consistency pillar scales as `Math.min(currentStreak / 70, 1) * 50` (100% at 70-day streak)
+
+Rank can go up **and down**. Recalculates on workout finish and app launch.
 
 ## Design System (`constants/design.ts`)
 
@@ -131,6 +142,9 @@ Patterns: page titles = `typography['3xl']` bold · section labels = `typography
 | `components/RankIcon.tsx` | Rank PNG renderer with glow/gloss/animated props |
 | `components/ui/AppText.tsx` | Typography wrapper — always use instead of `<Text>` |
 | `components/ui/icon-symbol.tsx` | SF Symbol → MaterialIcons mapping; add new icons here |
+| `components/WorkoutOverlay.tsx` | Active workout modal — timestamp-based timers, AppState listener, keep-awake, notifications, `RestDoneBanner` sub-component |
+| `components/WorkoutCompleteAnimation.tsx` | Full-screen workout finish overlay — glowing ring, streak pill, PR row, XP level bar, fitness score, rank banner; 6s auto-dismiss with drain bar, tap anywhere to close |
+| `components/RestTimer.tsx` | Inline rest timer ring (mode = `'inline'`); burst + fast-fade on done; banner in WorkoutOverlay handles the "GO!" signal |
 | `utils/sound.ts` | Alert sounds — expo-av on native, HTML5 Audio on web |
 | `app/+html.tsx` | PWA HTML wrapper — viewport lock, meta tags, safe area CSS |
 | `public/manifest.json` | Web App Manifest for PWA installability |
@@ -138,9 +152,17 @@ Patterns: page titles = `typography['3xl']` bold · section labels = `typography
 ## Gotchas
 
 - **Workout overlay** is at ROOT in `_layout.tsx` with `pointerEvents="box-none"` when minimized
-- **Rest timer** uses ref-based interval (not state) to avoid re-renders during drag
+- **Background timers:** both workout elapsed and rest timers use `Date.now()` timestamps (not incrementing counters) so they survive backgrounding. `AppState` listener snaps them back to real elapsed time when the app returns to foreground.
+- **Rest timer** uses a 500ms interval polling `restEndTimeRef.current - Date.now()` — timestamp-based, no re-render drift
+- **Rest timer done signal:** when `restTimerSeconds` hits 0, `RestTimer.tsx` plays a quick ring burst + fast-fade (≈700ms). Simultaneously `WorkoutOverlay` shows `RestDoneBanner` — a `primary→secondary` gradient banner that slides in from the top, auto-dismisses after 5s with a draining progress bar, and has a ✕ to dismiss early. The banner is `position: absolute` with `top={insets.top}` to stay below the notch. Uses `react-native-svg` for the lightning bolt icon and `expo-linear-gradient` for the gradient.
+- **`CompactRestTimerExpanded`** (simple mode, expanded view): returns `null` when `isDone` — banner is the signal; no redundant "REST COMPLETE!" text
+- **Workout complete animation:** Full-screen overlay (`zIndex: 10000`). `TouchableWithoutFeedback` wraps the whole screen — tapping anywhere dismisses early. XP bar and countdown drain bar use `useNativeDriver: false` (width-based); all other animations use `useNativeDriver: true`. The two types must never be mixed in the same `Animated.parallel()` call.
+- **Push notifications:** `expo-notifications` handler registered at root in `_layout.tsx` (web-guarded). WorkoutOverlay schedules a local notification when the app goes to background mid-workout; cancels it on foreground resume, finish, or cancel.
+- **Notification API (Expo SDK 54 / expo-notifications ~0.29.14):** use `shouldShowAlert: true` (not `shouldShowBanner`); use `result.granted` boolean on `requestPermissionsAsync()` (not `.status === 'granted'`)
+- **Keep-awake:** `expo-keep-awake` is activated inside WorkoutOverlay when `isActive && user.advancedSettings.disableSleep`; always call `deactivateKeepAwake()` in the cleanup
 - **Profile animations** (widgets, breakdown bars) use `useFocusEffect` — only trigger on tab focus
 - **Progress bar animations** use `useNativeDriver: false` (width-based); everything else `useNativeDriver: true`
+- **Profile stats grid:** two explicit `statsRow` Views (not `flexWrap`) + `minHeight: 110` on cards ensures consistent heights across all stat items
 - **PWA icons** in `public/` — do not delete; copied to `dist/` on every build
 - **AmbientBackground blobs** show through transparent tab screens on native only (hence the Platform.OS check)
 
