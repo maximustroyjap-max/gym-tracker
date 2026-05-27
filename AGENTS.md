@@ -1,6 +1,6 @@
 # ASCENT — Gym Tracker
 
-Gamified gym tracker for iOS, Android, and Web (PWA). React Native + Expo 54, TypeScript, Expo Router, Supabase backend (auth + PostgreSQL), deployed to Netlify. 5 tabs: Home, Workout, Exercises, History, Profile. 16-tier rank system driven by Fitness Score (4 pillars).
+Gamified gym tracker for iOS, Android, and Web (PWA). React Native + Expo 54, TypeScript, Expo Router, Supabase backend (auth + PostgreSQL), deployed to Netlify. 6 tabs: Home, Workout, Exercises, History, Profile, Friends. 16-tier rank system driven by Fitness Score (4 pillars).
 
 ## Commands
 
@@ -34,6 +34,7 @@ npx tsc --noEmit            # type check (run after every change)
 | `useUser()` → `{ user, updateUser, resetUser }` | `UserContext` | Supabase `profiles` table |
 | `useAuth()` → `{ isAuthenticated, login, signup, logout, authConfigError }` | `AuthContext` | Supabase Auth |
 | `useWorkout()` | `WorkoutContext` | Runtime only |
+| `useFriends()` → `{ friends, pendingRequests, isLoading, loadFriends, sendRequest, acceptRequest, declineRequest }` | Local hook | Supabase `friendships` table |
 
 ## Auth Flow
 
@@ -50,6 +51,7 @@ App launch → Splash → Supabase `getSession()` → no session: Auth screen / 
 ```ts
 User {
   username, avatar,           // avatar: 'avatar1'…'avatar10' or '' (initials)
+  friendCode,                 // auto-generated 6-char unique code, e.g. "B4NX12"
   theme,                      // 'dark' | 'light' | 'sunset'
   fitnessScore,               // 0-100
   fitnessBreakdown: { consistency, volume, progression, variety },
@@ -64,7 +66,9 @@ User {
 }
 ```
 
-Supabase `profiles` table: scalar columns (`current_streak`, `best_streak INTEGER DEFAULT 0`, `last_workout_date TEXT DEFAULT ''`, `weekly_target`, `fitness_score`, `rank`, `total_workouts`, `total_hours`, `username`, `avatar`, `theme`) + JSONB for `fitness_breakdown`, `body_measurements`, `notification_settings`, `advanced_settings`, `rest_timer_settings`, `workout_history`, `custom_exercises`, `templates`, `template_folders`, `weekly_history`. Text array: `hidden_exercise_ids`.
+Supabase `profiles` table: scalar columns (`current_streak`, `best_streak INTEGER DEFAULT 0`, `last_workout_date TEXT DEFAULT ''`, `weekly_target`, `fitness_score`, `rank`, `total_workouts`, `total_hours`, `username`, `avatar`, `theme`, `friend_code TEXT UNIQUE`) + JSONB for `fitness_breakdown`, `body_measurements`, `notification_settings`, `advanced_settings`, `rest_timer_settings`, `workout_history`, `custom_exercises`, `templates`, `template_folders`, `weekly_history`. Text array: `hidden_exercise_ids`.
+
+Supabase `friendships` table: `id UUID`, `requester_id UUID → profiles`, `addressee_id UUID → profiles`, `status TEXT ('pending'|'accepted')`, `created_at`. RLS: users can only read/write rows they are part of.
 
 ## Navigation
 
@@ -75,8 +79,10 @@ Supabase `profiles` table: scalar columns (`current_streak`, `best_streak INTEGE
 | Exercises | `/(tabs)/exercises` | Tab bar |
 | History | `/(tabs)/history` | Tab bar |
 | Profile | `/(tabs)/profile` | Tab bar |
+| Friends | `/(tabs)/social` | Tab bar |
 | Auth | `/auth` | After splash if not authenticated |
 | Rank Details | `/rank-details` | Home hero card or Profile rank tap |
+| Add Friend | `/add-friend` | Friends tab "+" button |
 | Settings | `/settings` | Profile gear icon |
 | Notifications | `/notifications` | Settings |
 | Advanced | `/advanced` | Settings |
@@ -137,12 +143,15 @@ Patterns: page titles = `typography['3xl']` bold · section labels = `typography
 | `constants/theme.ts` | 5 theme color palettes |
 | `constants/exercises.ts` | 150+ built-in exercises |
 | `constants/avatars.ts` | Avatar ID→image mapping + old emoji migration list |
-| `components/CurvedTabBar.tsx` | Liquid bubble tab bar; exports `TAB_BAR_TOTAL_HEIGHT = 84` |
+| `components/CurvedTabBar.tsx` | Liquid bubble tab bar; exports `TAB_BAR_TOTAL_HEIGHT = 84`; tab count is dynamic (not hardcoded) |
+| `components/FriendCard.tsx` | Friend list item — avatar initials, username, streak, rank icon, fitness score |
+| `hooks/useFriends.ts` | `useFriends()` — fetch friends + pending requests, send/accept/decline requests |
 | `components/NeonCard.tsx` | Card surface — cyan/purple neon border, optional `glowColor` for hero variant |
 | `components/RankIcon.tsx` | Rank PNG renderer with glow/gloss/animated props |
 | `components/ui/AppText.tsx` | Typography wrapper — always use instead of `<Text>` |
 | `components/ui/icon-symbol.tsx` | SF Symbol → MaterialIcons mapping; add new icons here |
 | `components/WorkoutOverlay.tsx` | Active workout modal — timestamp-based timers, AppState listener, keep-awake, notifications, `RestDoneBanner` sub-component |
+| `components/AnimatedSplashScreen.tsx` | Neon Ignite startup animation — spark traces mountain SVG path, logo ignites, ASCENT letters stagger in; unified component (no Platform split, no video file) |
 | `components/WorkoutCompleteAnimation.tsx` | Full-screen workout finish overlay — glowing ring, streak pill, PR row, XP level bar, fitness score, rank banner; 6s auto-dismiss with drain bar, tap anywhere to close |
 | `components/RestTimer.tsx` | Inline rest timer ring (mode = `'inline'`); burst + fast-fade on done; banner in WorkoutOverlay handles the "GO!" signal |
 | `utils/sound.ts` | Alert sounds — expo-av on native, HTML5 Audio on web |
@@ -158,13 +167,18 @@ Patterns: page titles = `typography['3xl']` bold · section labels = `typography
 - **`CompactRestTimerExpanded`** (simple mode, expanded view): returns `null` when `isDone` — banner is the signal; no redundant "REST COMPLETE!" text
 - **Workout complete animation:** Full-screen overlay (`zIndex: 10000`). `TouchableWithoutFeedback` wraps the whole screen — tapping anywhere dismisses early. XP bar and countdown drain bar use `useNativeDriver: false` (width-based); all other animations use `useNativeDriver: true`. The two types must never be mixed in the same `Animated.parallel()` call.
 - **Push notifications:** `expo-notifications` handler registered at root in `_layout.tsx` (web-guarded). WorkoutOverlay schedules a local notification when the app goes to background mid-workout; cancels it on foreground resume, finish, or cancel.
-- **Notification API (Expo SDK 54 / expo-notifications ~0.29.14):** use `shouldShowAlert: true` (not `shouldShowBanner`); use `result.granted` boolean on `requestPermissionsAsync()` (not `.status === 'granted'`)
+- **Notification API (Expo SDK 54 / expo-notifications ~0.32.17):** use `shouldShowBanner: true` + `shouldShowList: true` (`shouldShowAlert` is deprecated); use `result.granted` boolean on `requestPermissionsAsync()` (not `.status === 'granted'`)
 - **Keep-awake:** `expo-keep-awake` is activated inside WorkoutOverlay when `isActive && user.advancedSettings.disableSleep`; always call `deactivateKeepAwake()` in the cleanup
 - **Profile animations** (widgets, breakdown bars) use `useFocusEffect` — only trigger on tab focus
 - **Progress bar animations** use `useNativeDriver: false` (width-based); everything else `useNativeDriver: true`
 - **Profile stats grid:** two explicit `statsRow` Views (not `flexWrap`) + `minHeight: 110` on cards ensures consistent heights across all stat items
 - **PWA icons** in `public/` — do not delete; copied to `dist/` on every build
 - **AmbientBackground blobs** show through transparent tab screens on native only (hence the Platform.OS check)
+- **Friend code backfill:** `UserContext.loadUser` auto-generates a `friend_code` for users who don't have one and writes it back to Supabase — no manual migration needed for existing users
+- **Friends search smart mode:** in `add-friend.tsx`, if the input is exactly 6 uppercase alphanumeric characters (`/^[A-Z0-9]{6}$/`), the search switches to exact `friend_code` lookup instead of partial `username` search
+- **Expo Router typed paths:** `/add-friend` uses `router.push('/add-friend' as any)` because Expo Router's generated types only update when the dev server runs — this is expected for newly added screens
+- **Splash animation:** `AnimatedSplashScreen` uses two separate `Animated.parallel()` groups — Group A (SVG `strokeDashoffset`, `useNativeDriver: false`) and Group B (everything else, `useNativeDriver: true`). Never mix them in the same parallel. Colors are hardcoded (`#0F0F0F` bg, `#00FF88` primary) — `useTheme()` is not available at splash time. `ExpoSplashScreen.hideAsync()` is called on mount.
+- **`strokeDashoffset` in RN SVG:** use `Animated.createAnimatedComponent(Path)` from `react-native-svg`, pass `Animated.Value` as the prop with `as any` cast — TypeScript doesn't know the prop accepts animated values but it does at runtime.
 
 ## Deployment
 
