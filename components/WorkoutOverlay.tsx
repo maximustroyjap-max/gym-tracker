@@ -35,6 +35,8 @@ import { playAlertSound } from '@/utils/sound';
 import { spacing, radius, typography, touch, activeOpacity } from '@/constants/design';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as Notifications from 'expo-notifications';
+import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 
 const SCREEN_HEIGHT = Dimensions.get('screen').height;
 const MINIMIZED_HEIGHT = 110;
@@ -144,6 +146,108 @@ function CompactRestTimerExpanded({
         {isDone ? 'REST COMPLETE!' : `Resting: ${timeString}`}
       </Text>
     </View>
+  );
+}
+
+function RestDoneBanner({
+  visible,
+  onDismiss,
+  topOffset,
+  Colors,
+}: {
+  visible: boolean;
+  onDismiss: () => void;
+  topOffset: number;
+  Colors: ReturnType<typeof useTheme>;
+}) {
+  const slideAnim = useRef(new Animated.Value(-80)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (visible) {
+      progressAnim.setValue(1);
+      Animated.parallel([
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 60,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      Animated.timing(progressAnim, {
+        toValue: 0,
+        duration: 5000,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      progressAnim.stopAnimation();
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: -80,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [visible]);
+
+  const progressWidth = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
+
+  return (
+    <Animated.View
+      pointerEvents={visible ? 'auto' : 'none'}
+      style={[
+        styles.restDoneBanner,
+        {
+          top: topOffset,
+          transform: [{ translateY: slideAnim }],
+          opacity: opacityAnim,
+        },
+      ]}>
+      <LinearGradient
+        colors={[Colors.primary, Colors.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.restDoneBannerGradient}>
+        <View style={styles.restDoneBannerInner}>
+          <View style={styles.restDoneBannerIcon}>
+            <Svg width={26} height={26} viewBox="0 0 24 24" fill="rgba(0,0,0,0.72)">
+              <Path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" />
+            </Svg>
+          </View>
+          <View style={styles.restDoneBannerText}>
+            <Text style={styles.restDoneBannerTitle}>GO — NEXT SET!</Text>
+            <Text style={styles.restDoneBannerSub}>Rest complete · tap ✕ to dismiss</Text>
+          </View>
+          <TouchableOpacity
+            onPress={onDismiss}
+            activeOpacity={activeOpacity.button}
+            style={styles.restDoneBannerClose}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Text style={styles.restDoneBannerCloseText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.restDoneBannerProgressTrack}>
+          <Animated.View
+            style={[styles.restDoneBannerProgressFill, { width: progressWidth }]}
+          />
+        </View>
+      </LinearGradient>
+    </Animated.View>
   );
 }
 
@@ -1003,5 +1107,60 @@ const styles = StyleSheet.create({
   minimizedDate: {
     fontSize: typography.xs,
     marginTop: 2,
+  },
+  restDoneBanner: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 100,
+  },
+  restDoneBannerGradient: {
+    borderBottomLeftRadius: radius.lg,
+    borderBottomRightRadius: radius.lg,
+    overflow: 'hidden',
+  },
+  restDoneBannerInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+    gap: spacing.md,
+  },
+  restDoneBannerIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  restDoneBannerText: {
+    flex: 1,
+  },
+  restDoneBannerTitle: {
+    fontSize: typography.base,
+    fontWeight: '900',
+    color: 'rgba(0,0,0,0.82)',
+    letterSpacing: 0.5,
+  },
+  restDoneBannerSub: {
+    fontSize: typography.xs,
+    color: 'rgba(0,0,0,0.55)',
+    marginTop: 2,
+  },
+  restDoneBannerClose: {
+    padding: spacing.xs,
+  },
+  restDoneBannerCloseText: {
+    fontSize: typography.base,
+    fontWeight: '700',
+    color: 'rgba(0,0,0,0.4)',
+  },
+  restDoneBannerProgressTrack: {
+    height: 3,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+  },
+  restDoneBannerProgressFill: {
+    height: 3,
+    backgroundColor: 'rgba(255,255,255,0.45)',
   },
 });
