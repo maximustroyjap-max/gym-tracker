@@ -94,6 +94,7 @@ export interface BodyMeasurements {
 export interface User {
   username: string;
   avatar: string;
+  friendCode: string;
   level: number;
   xp: number;
   xpToNextLevel: number;
@@ -167,6 +168,7 @@ export function createEmptyUser(): User {
   return {
     username: 'GymNewbie',
     avatar: '',
+    friendCode: '',
     level: 1,
     xp: 0,
     xpToNextLevel: 100,
@@ -233,6 +235,7 @@ export const DEFAULT_USER: User = {
   totalHours: 0,
   weeklyTarget: 5,
   monthlyVolumeGoal: 1000,
+  friendCode: '',
   weeklyHistory: generateSampleHistory(),
   notificationSettings: {
     unfinishedWorkoutAlert: true,

@@ -21,6 +21,10 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+function generateFriendCode(): string {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
 /** Map camelCase User field names to snake_case DB column names */
 const FIELD_MAP: Record<string, string> = {
   username: 'username',
@@ -52,6 +56,7 @@ const FIELD_MAP: Record<string, string> = {
   customExercises: 'custom_exercises',
   workoutHistory: 'workout_history',
   weeklyHistory: 'weekly_history',
+  friendCode: 'friend_code',
 };
 
 /** Convert a Supabase profiles row into our app's User object */
@@ -86,6 +91,7 @@ function profileToUser(profile: any): User {
     customExercises: profile.custom_exercises ?? [],
     workoutHistory: profile.workout_history ?? [],
     weeklyHistory: profile.weekly_history ?? [],
+    friendCode: profile.friend_code ?? '',
   };
 }
 
@@ -184,6 +190,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             rank: computedRank,
           })
           .eq('id', userId);
+      }
+
+      // Generate friend_code for users who don't have one yet
+      if (!profile.friend_code) {
+        const code = generateFriendCode();
+        await supabase.from('profiles').update({ friend_code: code }).eq('id', userId);
+        mergedUser = { ...mergedUser, friendCode: code };
       }
 
       setUser(mergedUser);

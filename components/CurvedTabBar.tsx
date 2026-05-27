@@ -50,15 +50,14 @@ const BAR_PATH_D = [
   `Z`,
 ].join(' ');
 
-// Tab positions
-const TAB_W = SCREEN_W / 5;
-const TAB_POSITIONS: number[] = Array.from(
-  { length: 5 },
-  (_, i) => TAB_W * (i + 0.5)
-);
 
 export function CurvedTabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
   const Colors = useTheme();
+  const tabW = SCREEN_W / state.routes.length;
+  const tabPositions = Array.from(
+    { length: state.routes.length },
+    (_, i) => tabW * (i + 0.5)
+  );
 
   // ── Entrance animation ──
   const entranceY = useSharedValue(40);
@@ -75,7 +74,7 @@ export function CurvedTabBar({ state, descriptors, navigation, insets }: BottomT
   }));
 
   // ── Bubble position — spring on EVERY tab change ──
-  const currentX = useSharedValue(TAB_POSITIONS[state.index]);
+  const currentX = useSharedValue(tabPositions[state.index]);
   const bubbleScale = useSharedValue(1);
   const iconRotate = useSharedValue(0);
   const prevIndex = useRef(state.index);
@@ -83,7 +82,7 @@ export function CurvedTabBar({ state, descriptors, navigation, insets }: BottomT
   useEffect(() => {
     if (state.index !== prevIndex.current) {
       // Snappy spring slide
-      currentX.value = withSpring(TAB_POSITIONS[state.index], {
+      currentX.value = withSpring(tabPositions[state.index], {
         damping: 14,
         stiffness: 220,
         mass: 0.85,
@@ -187,7 +186,8 @@ export function CurvedTabBar({ state, descriptors, navigation, insets }: BottomT
               route={route}
               descriptors={descriptors}
               navigation={navigation}
-              positionX={TAB_POSITIONS[index]}
+              positionX={tabPositions[index]}
+              tabW={tabW}
               Colors={Colors}
             />
           );
@@ -203,12 +203,14 @@ function TabButton({
   descriptors,
   navigation,
   positionX,
+  tabW,
   Colors,
 }: {
   route: any;
   descriptors: any;
   navigation: any;
   positionX: number;
+  tabW: number;
   Colors: ReturnType<typeof useTheme>;
 }) {
   const { options } = descriptors[route.key];
@@ -222,7 +224,7 @@ function TabButton({
 
   return (
     <TouchableOpacity
-      style={[styles.tabButton, { left: positionX - TAB_W / 2, width: TAB_W }]}
+      style={[styles.tabButton, { left: positionX - tabW / 2, width: tabW }]}
       onPress={onPress}
       activeOpacity={0.7}
       accessibilityRole="button"

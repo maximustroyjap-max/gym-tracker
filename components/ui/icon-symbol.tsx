@@ -20,6 +20,7 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'dumbbell.fill': 'fitness-center',
   'person.fill': 'person',
+  'person.2.fill': 'group',
   'checkmark': 'check',
   'xmark': 'close',
   'gear': 'settings',
