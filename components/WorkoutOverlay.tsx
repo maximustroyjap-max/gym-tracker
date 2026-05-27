@@ -79,11 +79,11 @@ function CompactRestTimer({ seconds, Colors }: { seconds: number; Colors: Return
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: isDone ? Colors.primary + '18' : Colors.card,
+        backgroundColor: isDone ? Colors.primary + '28' : Colors.card,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.xs,
         borderRadius: radius.md,
-        borderWidth: 1,
+        borderWidth: isDone ? 1.5 : 1,
         borderColor: isDone ? Colors.primary : Colors.border,
         marginBottom: spacing.xs,
       }}>
@@ -97,7 +97,7 @@ function CompactRestTimer({ seconds, Colors }: { seconds: number; Colors: Return
         }}
       />
       <Text style={{ fontSize: typography.sm, fontWeight: '700', color: isDone ? Colors.primary : Colors.text }}>
-        {isDone ? 'DONE!' : `REST ${timeString}`}
+        {isDone ? 'DONE! GO!' : `REST ${timeString}`}
       </Text>
     </View>
   );
@@ -114,6 +114,9 @@ function CompactRestTimerExpanded({
 }) {
   if (!active) return null;
   const isDone = seconds <= 0;
+  // Banner handles the done signal in expanded view — nothing to show here
+  if (isDone) return null;
+
   const minutes = Math.floor(Math.max(0, seconds) / 60);
   const secs = Math.floor(Math.max(0, seconds) % 60);
   const timeString = `${minutes}:${secs.toString().padStart(2, '0')}`;
@@ -125,12 +128,12 @@ function CompactRestTimerExpanded({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: spacing.md,
-        backgroundColor: isDone ? Colors.primary + '12' : Colors.card,
+        backgroundColor: Colors.card,
         paddingHorizontal: spacing.lg,
         paddingVertical: spacing.sm,
         borderRadius: radius.lg,
         borderWidth: 1,
-        borderColor: isDone ? Colors.primary : Colors.border,
+        borderColor: Colors.border,
         alignSelf: 'center',
       }}>
       <View
@@ -138,12 +141,12 @@ function CompactRestTimerExpanded({
           width: 8,
           height: 8,
           borderRadius: radius.full,
-          backgroundColor: isDone ? Colors.primary : Colors.danger,
+          backgroundColor: Colors.danger,
           marginRight: spacing.sm,
         }}
       />
-      <Text style={{ fontSize: typography.lg, fontWeight: 'bold', color: isDone ? Colors.primary : Colors.text }}>
-        {isDone ? 'REST COMPLETE!' : `Resting: ${timeString}`}
+      <Text style={{ fontSize: typography.lg, fontWeight: 'bold', color: Colors.text }}>
+        {`Resting: ${timeString}`}
       </Text>
     </View>
   );
