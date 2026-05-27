@@ -280,6 +280,9 @@ export function WorkoutOverlay() {
   const restTimerSecondsRef = useRef(0);
   restTimerSecondsRef.current = restTimerSeconds;
 
+  const [showRestDoneBanner, setShowRestDoneBanner] = useState(false);
+  const restDoneBannerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Timestamp refs for background-safe timers
   const workoutStartTimeRef = useRef<number>(0);
   const restEndTimeRef = useRef<number>(0);
@@ -292,6 +295,14 @@ export function WorkoutOverlay() {
   const pendingNotifIdRef = useRef<string | null>(null);
   const notifSettingsRef = useRef(user.notificationSettings);
   notifSettingsRef.current = user.notificationSettings;
+
+  const dismissRestDoneBanner = useCallback(() => {
+    if (restDoneBannerTimeoutRef.current) {
+      clearTimeout(restDoneBannerTimeoutRef.current);
+      restDoneBannerTimeoutRef.current = null;
+    }
+    setShowRestDoneBanner(false);
+  }, []);
 
   const [showCompleteAnimation, setShowCompleteAnimation] = useState(false);
   const [workoutStats, setWorkoutStats] = useState({
@@ -385,10 +396,23 @@ export function WorkoutOverlay() {
   useEffect(() => {
     if (!restTimerActive || restTimerSeconds !== 0) return;
     playAlertSound(user.restTimerSettings.soundEffect);
-    const timeout = setTimeout(() => {
+    // Show the "GO — NEXT SET!" banner
+    setShowRestDoneBanner(true);
+    restDoneBannerTimeoutRef.current = setTimeout(() => {
+      setShowRestDoneBanner(false);
+      restDoneBannerTimeoutRef.current = null;
+    }, 5000);
+    // Clear the rest timer state after the ring animation completes
+    const clearTimer = setTimeout(() => {
       setRestTimerActive(false);
     }, 2800);
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(clearTimer);
+      if (restDoneBannerTimeoutRef.current) {
+        clearTimeout(restDoneBannerTimeoutRef.current);
+        restDoneBannerTimeoutRef.current = null;
+      }
+    };
   }, [restTimerActive, restTimerSeconds, user.restTimerSettings.soundEffect]);
 
   // Keep screen awake during active workouts when the user has enabled that setting
@@ -461,10 +485,11 @@ export function WorkoutOverlay() {
 
   const restTimerDuration = user.restTimerSettings.durationSeconds;
   const startRestTimer = useCallback(() => {
+    dismissRestDoneBanner();
     restEndTimeRef.current = Date.now() + restTimerDuration * 1000;
     setRestTimerActive(true);
     setRestTimerSeconds(restTimerDuration);
-  }, [restTimerDuration]);
+  }, [restTimerDuration, dismissRestDoneBanner]);
 
   const expandedPanResponder = useRef(
     PanResponder.create({
@@ -522,6 +547,7 @@ export function WorkoutOverlay() {
   ).current;
 
   const handleCancel = () => {
+    dismissRestDoneBanner();
     if (Platform.OS !== 'web' && pendingNotifIdRef.current) {
       Notifications.cancelScheduledNotificationAsync(pendingNotifIdRef.current).catch(() => {});
       pendingNotifIdRef.current = null;
@@ -696,6 +722,7 @@ export function WorkoutOverlay() {
       Notifications.cancelScheduledNotificationAsync(pendingNotifIdRef.current).catch(() => {});
       pendingNotifIdRef.current = null;
     }
+    dismissRestDoneBanner();
     setIsActive(false);
     setRestTimerActive(false);
     setShowCompleteAnimation(true);
@@ -882,6 +909,14 @@ export function WorkoutOverlay() {
                 <IconSymbol name="checkmark" size={18} color={Colors.background} />
               </TouchableOpacity>
             </View>
+
+            {/* Rest Done Banner */}
+            <RestDoneBanner
+              visible={showRestDoneBanner}
+              onDismiss={dismissRestDoneBanner}
+              topOffset={insets.top}
+              Colors={Colors}
+            />
 
             <ScrollView
               style={styles.scrollView}
