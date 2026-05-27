@@ -7,17 +7,13 @@
  * - Circular progress ring that shrinks as time passes
  * - Pulsing glow effect while active
  * - Color shifts: green → yellow → red as time runs out
- * - "DONE!" celebration animation when timer finishes
- * - Smooth fade-out (dissolve) when timer ends
- *
- * Default: 2 minutes (120 seconds)
+ * - Quick burst + fast-fade when timer finishes (banner in WorkoutOverlay handles the "GO!" signal)
  */
 
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/context/ThemeContext';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { spacing, typography } from '@/constants/design';
 
 interface RestTimerProps {
@@ -34,8 +30,6 @@ export function RestTimer({ secondsRemaining, totalSeconds, active }: RestTimerP
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  const doneScaleAnim = useRef(new Animated.Value(0)).current;
-  const doneOpacityAnim = useRef(new Animated.Value(0)).current;
   const ringScaleAnim = useRef(new Animated.Value(1)).current;
   const flashAnim = useRef(new Animated.Value(0)).current;
 
@@ -44,9 +38,6 @@ export function RestTimer({ secondsRemaining, totalSeconds, active }: RestTimerP
   // Fade in when activated
   useEffect(() => {
     if (active && !isDone) {
-      // Reset done animations
-      doneScaleAnim.setValue(0);
-      doneOpacityAnim.setValue(0);
       flashAnim.setValue(0);
 
       Animated.parallel([
@@ -64,54 +55,47 @@ export function RestTimer({ secondsRemaining, totalSeconds, active }: RestTimerP
     }
   }, [active, isDone]);
 
-  // "DONE!" celebration animation when timer reaches 0
+  // "Done" burst animation — quick scale pop + flash, then fast fade out
   useEffect(() => {
-    if (isDone) {
-      Animated.sequence([
-        // Flash effect
+    if (!isDone) return;
+    Animated.sequence([
+      // Scale burst + flash in
+      Animated.parallel([
+        Animated.spring(ringScaleAnim, {
+          toValue: 1.15,
+          friction: 5,
+          tension: 80,
+          useNativeDriver: true,
+        }),
         Animated.timing(flashAnim, {
           toValue: 1,
-          duration: 200,
+          duration: 150,
           useNativeDriver: true,
         }),
-        // Ring expands
+      ]),
+      // Snap back + flash out
+      Animated.parallel([
         Animated.spring(ringScaleAnim, {
-          toValue: 1.3,
-          friction: 4,
-          tension: 60,
+          toValue: 1,
+          friction: 6,
+          tension: 80,
           useNativeDriver: true,
         }),
-        // "DONE!" text pops in
-        Animated.parallel([
-          Animated.spring(doneScaleAnim, {
-            toValue: 1,
-            friction: 5,
-            tension: 80,
-            useNativeDriver: true,
-          }),
-          Animated.timing(doneOpacityAnim, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-        ]),
-        // Hold briefly
-        Animated.delay(600),
-        // Fade everything out (dissolve)
-        Animated.parallel([
-          Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(doneOpacityAnim, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-        ]),
-      ]).start();
-    }
+        Animated.timing(flashAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Brief hold — lets the banner begin sliding in
+      Animated.delay(100),
+      // Fade out the entire timer component
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [isDone]);
 
   // Pulsing glow animation while active and counting down
@@ -142,8 +126,8 @@ export function RestTimer({ secondsRemaining, totalSeconds, active }: RestTimerP
   const progress = Math.max(0, Math.min(1, secondsRemaining / totalSeconds));
 
   // Format time as MM:SS
-  const minutes = Math.floor(secondsRemaining / 60);
-  const seconds = Math.floor(secondsRemaining % 60);
+  const minutes = Math.floor(Math.max(0, secondsRemaining) / 60);
+  const seconds = Math.floor(Math.max(0, secondsRemaining) % 60);
   const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
   // Color shifts from green (full) to orange (half) to red (empty)
@@ -172,8 +156,8 @@ export function RestTimer({ secondsRemaining, totalSeconds, active }: RestTimerP
           styles.flashOverlay,
           {
             opacity: flashAnim.interpolate({
-              inputRange: [0, 1, 1],
-              outputRange: [0, 0.3, 0],
+              inputRange: [0, 1],
+              outputRange: [0, 0.3],
             }),
             backgroundColor: Colors.primary,
           },
@@ -211,7 +195,7 @@ export function RestTimer({ secondsRemaining, totalSeconds, active }: RestTimerP
           ]}
         />
 
-        {/* Progress arc using conic-gradient-like approach with border */}
+        {/* Progress arc */}
         <View
           style={[
             styles.progressRing,
@@ -227,34 +211,11 @@ export function RestTimer({ secondsRemaining, totalSeconds, active }: RestTimerP
 
         {/* Center content */}
         <View style={styles.centerContent}>
-          {isDone ? (
-            <>
-              <Animated.View
-                style={{
-                  transform: [{ scale: doneScaleAnim }],
-                  opacity: doneOpacityAnim,
-                  alignItems: 'center',
-                }}>
-                <IconSymbol
-                  name="checkmark.circle.fill"
-                  size={48}
-                  color={Colors.primary}
-                />
-                <Text style={[styles.doneText, { color: Colors.primary }]}>
-                  DONE!
-                </Text>
-                <Text style={[styles.doneSubtext, { color: Colors.textSecondary }]}>Rest complete</Text>
-              </Animated.View>
-            </>
-          ) : (
-            <>
-              <Text style={[styles.restLabel, { color: Colors.textSecondary }]}>REST</Text>
-              <Text style={[styles.timeText, { color: timerColor }]}>
-                {timeString}
-              </Text>
-              <Text style={[styles.secondsLabel, { color: Colors.textSecondary }]}>seconds</Text>
-            </>
-          )}
+          <Text style={[styles.restLabel, { color: Colors.textSecondary }]}>REST</Text>
+          <Text style={[styles.timeText, { color: timerColor }]}>
+            {timeString}
+          </Text>
+          <Text style={[styles.secondsLabel, { color: Colors.textSecondary }]}>seconds</Text>
         </View>
       </Animated.View>
 
@@ -308,7 +269,6 @@ const styles = StyleSheet.create({
   progressRing: {
     position: 'absolute',
     borderWidth: 4,
-    // We rotate to start from top
     transform: [{ rotate: '-90deg' }],
   },
   centerContent: {
@@ -331,16 +291,6 @@ const styles = StyleSheet.create({
     fontSize: typography.xs,
     marginTop: 2,
     letterSpacing: 1,
-  },
-  doneText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 8,
-    letterSpacing: 2,
-  },
-  doneSubtext: {
-    fontSize: typography.sm,
-    marginTop: spacing.xs,
   },
   bottomProgressBar: {
     marginTop: spacing.lg,
