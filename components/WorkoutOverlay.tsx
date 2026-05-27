@@ -317,8 +317,14 @@ export function WorkoutOverlay() {
     fitnessScore: 0,
     fitnessBreakdown: { consistency: 0, volume: 0, progression: 0, variety: 0 } as FitnessBreakdown,
     rankChanged: false,
-    newRank: 'Bronze',
-    oldRank: 'Bronze',
+    newRank: 'Bronze 1',
+    oldRank: 'Bronze 1',
+    prAchieved: false,
+    prDetails: '',
+    newLevel: 1,
+    newXp: 0,
+    newXpToNextLevel: 100,
+    currentStreak: 0,
   });
 
   useEffect(() => {
@@ -719,6 +725,12 @@ export function WorkoutOverlay() {
       rankChanged,
       newRank,
       oldRank: user.rank,
+      prAchieved,
+      prDetails,
+      newLevel,
+      newXp,
+      newXpToNextLevel,
+      currentStreak: newStreak,
     });
 
     if (Platform.OS !== 'web' && pendingNotifIdRef.current) {
@@ -1014,6 +1026,12 @@ export function WorkoutOverlay() {
           rankChanged={workoutStats.rankChanged}
           newRank={workoutStats.newRank}
           oldRank={workoutStats.oldRank}
+          prAchieved={workoutStats.prAchieved}
+          prDetails={workoutStats.prDetails}
+          newLevel={workoutStats.newLevel}
+          newXp={workoutStats.newXp}
+          newXpToNextLevel={workoutStats.newXpToNextLevel}
+          currentStreak={workoutStats.currentStreak}
           onComplete={handleAnimationComplete}
         />
       )}
